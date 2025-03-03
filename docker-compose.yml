@@ -1,0 +1,73 @@
+version: "3.9"
+
+services:
+  backend:
+    #wywołuje dockerfile z backendu
+    build: ./backend
+    #migracje automatyzują zarządzanie wersjonowaniem tabel w bazie danych np. jak chcemy coś zaktualizować, nie trzeba przebudowywać obrazu
+    command: >
+      sh -c "python manage.py makemigrations api &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+    #jak się uruchomi w kontenerze i się zmieni jakiś plik to powinien się ponownie otworzyć, uwspólnia folder 
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        #próbuje wywołać czy postgres już wstał komendą shelową.
+        condition: service_healthy
+    environment:
+      - DB_NAME=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=newpassword
+      - DB_HOST=postgres
+
+  postgres:
+  #jaki obraz bazy danych (pobiera jakieś komendy ze stronki postgresa)
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: newpassword
+      POSTGRES_DB: postgres
+    ports:
+    #mapowanie portów: (zewnątrz) host <-> kontener (wewnątrz)
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    #zwraca czy baza wstała
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: newpassword
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+  ui-app:
+    build: ./ui-app
+    ports:
+      - "8080:80"
+    volumes:
+      - ./ui-app:/app  # Synchronizuje lokalny folder `ui-app` z folderem w kontenerze
+    working_dir: /app
+    depends_on:
+      - backend
+      #ustawia zmienną środowiskową i urla na backend do komunikacji (w reatcie automatycznie są dostępne w kodzie frontendu)
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:8000/api
+
+volumes:
+  postgres_data:
+  pgadmin_data:
