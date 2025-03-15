@@ -52,7 +52,14 @@ MIDDLEWARE = [
 'django.contrib.messages.middleware.MessageMiddleware',
 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]
+
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8080",
+    "http://localhost:5173",
+]
+
+# CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'backend.urls'
 
@@ -84,8 +91,8 @@ DATABASES = {
 'NAME': 'postgres',
 'USER': 'postgres',
 'PASSWORD': 'newpassword',
-# 'HOST': 'postgres', # gdy uruchamiamy z wykorzystaniem docker-compose !!!
-'HOST': 'localhost', # gdy uruchamiamy lokalnie !!!
+'HOST': 'postgres', # gdy uruchamiamy z wykorzystaniem docker-compose !!!
+# 'HOST': 'localhost', # gdy uruchamiamy lokalnie !!!
 'PORT': '5432',
 }
 }
