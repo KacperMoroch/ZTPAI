@@ -5,9 +5,9 @@
   text-align: center;
 }
 
-/* Wycentrowanie tekstu zarówno w pionie, jak i poziomie */
 .container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 100vh;
