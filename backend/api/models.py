@@ -1,4 +1,64 @@
-from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin  
+from django.db import models  
+from django.core.exceptions import ValidationError  
+from django.conf import settings  
+
+# Token._meta.get_field('user').remote_field.model = settings.AUTH_USER_MODEL
+
+# Manager użytkowników
+class UserAccountManager(BaseUserManager):
+    def create_user(self, email, login, password=None):
+        if not email:
+            raise ValueError("Użytkownik musi mieć adres e-mail")
+        if not login:
+            raise ValueError("Użytkownik musi mieć login")
+
+        user = self.model(email=self.normalize_email(email), login=login)
+        if password:
+            user.set_password(password)  # Haszowanie hasła
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, login, password):
+        user = self.create_user(email, login, password)
+        user.is_staff = True
+        user.is_superuser = True
+        user.save(using=self._db)
+        return user
+
+
+class UserAccount(AbstractBaseUser, PermissionsMixin):
+    id_role = models.ForeignKey("Role", null=True, blank=True, on_delete=models.SET_NULL)
+    email = models.EmailField(unique=True)
+    login = models.CharField(max_length=50, unique=True)
+    enabled = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    # atrybuty wymagane do panelu admina
+    is_staff = models.BooleanField(default=False) 
+    is_superuser = models.BooleanField(default=False)  
+
+    objects = UserAccountManager()
+
+    USERNAME_FIELD = "email" 
+    REQUIRED_FIELDS = ["login"]
+
+    groups = models.ManyToManyField(
+        "auth.Group",
+        blank=True
+    )
+
+    user_permissions = models.ManyToManyField(
+        "auth.Permission",
+        blank=True
+    )
+
+    def clean(self):
+        if len(self.login) < 4:
+            raise ValidationError("Login musi mieć co najmniej 4 znaki.")
+
+    def __str__(self):
+        return self.login
 
 
 # tabela ról użytkowników
@@ -8,18 +68,6 @@ class Role(models.Model):
     def __str__(self):
         return self.rola
 
-# tabela kont użytkowników
-class UserAccount(models.Model):
-    id_role = models.ForeignKey(Role, null=True, on_delete=models.SET_NULL)
-    email = models.EmailField(unique=True)
-    login = models.CharField(max_length=50, unique=True)
-    password = models.CharField(max_length=255)
-    enabled = models.BooleanField(default=True)
-    salt = models.CharField(max_length=255, null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.login
 
 # tabela krajów
 class Country(models.Model):
