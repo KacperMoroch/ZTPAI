@@ -16,15 +16,39 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
-from api.views import ExampleView, get_user, get_all_users, get_player, get_all_players
+from django.urls import path # import funkcji `path` do definiowania tras URL
+from api.views import ExampleView, get_roles, get_user, get_all_users, get_player, get_all_players, login_user, register_user
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 
+# lista tras URL które będą obsługiwane przez Django
 urlpatterns = [
+    # ścieżka do panelu administracyjnego Django
     path('admin/', admin.site.urls),
+
+    # ścieżka do przykładowego widoku APIView, widoku opartego na klasie
     path('api/example/', ExampleView.as_view(), name='example'),
+
+    # ścieżka do pobrania listy wszystkich użytkowników
     path('api/users/', get_all_users, name='get_all_users'),
+
+    # scieżka do pobrania konkretnego użytkownika po ID
     path('api/users/<int:id>/', get_user, name='get_user'),
+
+    # ścieżka do pobrania listy wszystkich piłkarzy
     path('api/players/', get_all_players, name='get_all_players'),
+
+    # ścieżka do pobrania konkretnego piłkarza po ID
     path('api/players/<int:id>/', get_player, name='get_player'),
+
+    # ścieżka do pobrania listy ról użytkowników
+    path('api/roles/', get_roles, name='get_roles'), 
+
+    # Ścieżka do rejestracji nowego użytkownika
+    path('api/register/', register_user, name='register_user'),
+
+    # ścieżka do logowania użytkownika za pomocą JWT
+    path('api/login/', TokenObtainPairView.as_view(), name='login_user'),
 ]
+
+
