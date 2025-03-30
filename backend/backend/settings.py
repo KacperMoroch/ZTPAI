@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -38,9 +39,31 @@ INSTALLED_APPS = [
 'django.contrib.messages',
 'django.contrib.staticfiles',
 'rest_framework',
+'rest_framework.authtoken',
 'corsheaders',
 'api',
 ]
+
+#autoryzacja JWT
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication', #metoda autentykacji   
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    
+}
+#konfiguracja JWT
+SIMPLE_JWT = {
+   'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),    # Czas życia tokenu dostępu 5 minut
+   'REFRESH_TOKEN_LIFETIME': timedelta(days=1),      # Czas życia tokenu odświeżenia 1 dni
+   'ROTATE_REFRESH_TOKENS': False,                   # Nie rotować tokenów odświeżenia (token sie nie zmienia)
+   'BLACKLIST_AFTER_ROTATION': True,                # Czarna lista po rotacji tokenów (stare tokeny tu trafiają)
+   'ALGORITHM': 'HS256',                             # Algorytm szyfrowania 
+   'SIGNING_KEY': SECRET_KEY,                        # Klucz podpisu 
+   'AUTH_HEADER_TYPES': ('Bearer',),                 # Typ nagłówka autoryzacyjnego
+}
 
 MIDDLEWARE = [
 'corsheaders.middleware.CorsMiddleware',
@@ -92,7 +115,7 @@ DATABASES = {
 'USER': 'postgres',
 'PASSWORD': 'newpassword',
 'HOST': 'postgres', # gdy uruchamiamy z wykorzystaniem docker-compose !!!
-# 'HOST': 'localhost', # gdy uruchamiamy lokalnie !!!
+#'HOST': 'localhost', # gdy uruchamiamy lokalnie !!!
 'PORT': '5432',
 }
 }
@@ -138,3 +161,12 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# AUTHENTICATION_BACKENDS = [
+#     'django.contrib.auth.backends.ModelBackend',
+#     'api.authentication.EmailOrLoginAuthBackend',  # Zmień na właściwą ścieżkę
+# ]
+
+AUTH_USER_MODEL = "api.UserAccount"
+
