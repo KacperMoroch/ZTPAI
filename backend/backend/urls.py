@@ -17,9 +17,19 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path # import funkcji `path` do definiowania tras URL
-from api.views import ExampleView, get_roles, get_user, get_all_users, get_player, get_all_players, login_user, register_user
-from rest_framework_simplejwt.views import TokenObtainPairView
 
+from api.views.users import get_all_users, get_user, register_user, login_user 
+from api.views.players import get_all_players, get_player
+from api.views.roles import get_roles
+from api.views.example import ExampleView
+
+# from api.views import ExampleView, get_roles, get_user, get_all_users, get_player, get_all_players, login_user, register_user
+
+
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
 
 # lista tras URL które będą obsługiwane przez Django
 urlpatterns = [
@@ -48,7 +58,28 @@ urlpatterns = [
     path('api/register/', register_user, name='register_user'),
 
     # ścieżka do logowania użytkownika za pomocą JWT
-    path('api/login/', TokenObtainPairView.as_view(), name='login_user'),
+    path('api/login/', login_user, name='login_user'),
+
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+
 ]
 
+schema_view = get_schema_view(
+   openapi.Info(
+      title="Goaldle API",  
+      default_version='v1',
+      description="Dokumentacja API dla Goaldle",
+      terms_of_service="https://www.example.com/terms/",
+      contact=openapi.Contact(email="kontakt@example.com"),
+      license=openapi.License(name="MIT License"),
+   ),
+   public=True,
+   permission_classes=(permissions.AllowAny,),
+)
 
+urlpatterns += [
+    path('api/docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),   # Swagger UI
+    path('api/redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),         # ReDoc UI
+    path('api/swagger.json', schema_view.without_ui(cache_timeout=0), name='schema-json'),          # surowy OpenAPI JSON
+]
