@@ -42,8 +42,9 @@ INSTALLED_APPS = [
 'rest_framework.authtoken',
 'corsheaders',
 'api',
+'drf_yasg',
 ]
-
+SWAGGER_USE_COMPAT_RENDERERS = False
 #autoryzacja JWT
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -52,11 +53,14 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ],
-    
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'EXCEPTION_HANDLER': 'backend.utils.exception_handler.custom_exception_handler'
 }
 #konfiguracja JWT
 SIMPLE_JWT = {
-   'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),    # Czas życia tokenu dostępu 5 minut
+   'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),    # Czas życia tokenu dostępu 5 minut
    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),      # Czas życia tokenu odświeżenia 1 dni
    'ROTATE_REFRESH_TOKENS': False,                   # Nie rotować tokenów odświeżenia (token sie nie zmienia)
    'BLACKLIST_AFTER_ROTATION': True,                # Czarna lista po rotacji tokenów (stare tokeny tu trafiają)
@@ -165,8 +169,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # AUTHENTICATION_BACKENDS = [
 #     'django.contrib.auth.backends.ModelBackend',
-#     'api.authentication.EmailOrLoginAuthBackend',  # Zmień na właściwą ścieżkę
+#     'api.authentication_backends.EmailBackend', 
 # ]
+
+
 
 AUTH_USER_MODEL = "api.UserAccount"
 
