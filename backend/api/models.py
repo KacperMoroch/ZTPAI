@@ -2,29 +2,41 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.db import models  
 from django.core.exceptions import ValidationError  
 from django.conf import settings  
+from django.contrib.admin.models import LogEntry
 
 # Token._meta.get_field('user').remote_field.model = settings.AUTH_USER_MODEL
+LogEntry._meta.get_field("user").remote_field.model = settings.AUTH_USER_MODEL
 
 # Manager użytkowników
 class UserAccountManager(BaseUserManager):
-    def create_user(self, email, login, password=None):
+    def create_user(self, email, login, password=None, **extra_fields):
         if not email:
             raise ValueError("Użytkownik musi mieć adres e-mail")
         if not login:
             raise ValueError("Użytkownik musi mieć login")
 
-        user = self.model(email=self.normalize_email(email), login=login)
+        email = self.normalize_email(email)
+        extra_fields.setdefault('is_staff', False)
+        extra_fields.setdefault('is_superuser', False)
+
+        user = self.model(email=email, login=login, **extra_fields)
+
         if password:
-            user.set_password(password)  # Haszowanie hasła
+            user.set_password(password)
+
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, login, password):
-        user = self.create_user(email, login, password)
-        user.is_staff = True
-        user.is_superuser = True
-        user.save(using=self._db)
-        return user
+    def create_superuser(self, email, login, password, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError("Superuser musi mieć is_staff=True.")
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError("Superuser musi mieć is_superuser=True.")
+
+        return self.create_user(email, login, password, **extra_fields)
 
 
 class UserAccount(AbstractBaseUser, PermissionsMixin):
