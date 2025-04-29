@@ -16,10 +16,17 @@ const Login = () => {
 
         try {
             const response = await axios.post("http://127.0.0.1:8000/api/login/", { email, password });
-            console.log("Zalogowano:", response.data);
+            const { access, refresh, is_superuser, message } = response.data;
 
-            localStorage.setItem("token", response.data.token); // zapisujemy token do localStorage
-            navigate("/");  //przekierowanie po logowaniu
+            if (access) {
+                sessionStorage.setItem("token", access);
+                sessionStorage.setItem("refresh", refresh);
+                sessionStorage.setItem("is_superuser", is_superuser);
+                console.log(message || "Zalogowano pomyślnie.");
+                navigate("/");
+            } else {
+                setError("Błąd: brak tokena w odpowiedzi");
+            }
         } catch (error) {
             if (error.response) {
                 setError(error.response.data.error || "Nieprawidłowe dane logowania!");

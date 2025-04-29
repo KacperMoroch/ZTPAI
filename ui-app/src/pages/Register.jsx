@@ -166,7 +166,7 @@ const Register = () => {
 
                 <Button
                     fullWidth
-                    onClick={() => (window.location.href = "/login")}
+                    onClick={() => navigate("/login")}
                     sx={{
                         p: 2,
                         fontSize: "1.08rem",
