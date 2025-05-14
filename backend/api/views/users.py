@@ -9,12 +9,17 @@ from django.contrib.auth import authenticate
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
+from ..tasks import send_registration_email
+
+# Importy własnych wyjątków
 from api.exceptions import (MissingFieldsException, EmailExistsException, LoginExistsException,
                            RegistrationFailedException, InvalidCredentialsException, LoginFailedException,
                            NoUsersFoundException, UserNotFoundException)
+
 from api.serializers import UserAccountSerializer
 from api.models import UserAccount
 from api.permissions import IsAdminUserCustom
+
 
 
 
@@ -28,15 +33,18 @@ from api.permissions import IsAdminUserCustom
         500: "Błąd serwera"
     }
 )
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated, IsAdminUserCustom])
+@authentication_classes([JWTAuthentication])  # Uwierzytelnianie JWT
+@permission_classes([IsAuthenticated, IsAdminUserCustom])  # Tylko zalogowani admini mają dostęp
 @api_view(['GET'])
 def get_all_users(request):
-    users = UserAccount.objects.all()
+    users = UserAccount.objects.all()  # Pobranie wszystkich użytkowników
     if not users.exists():
-        raise NoUsersFoundException()
-    serializer = UserAccountSerializer(users, many=True)
+        raise NoUsersFoundException()  # Brak użytkowników to  wyjątek
+    serializer = UserAccountSerializer(users, many=True)  # Serializacja listy użytkowników
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
 
 @swagger_auto_schema(
     method='get',
@@ -50,11 +58,14 @@ def get_all_users(request):
 @permission_classes([IsAuthenticated, IsAdminUserCustom])
 @api_view(['GET'])
 def get_user(request, id):
-    user = UserAccount.objects.filter(pk=id).first()
+    user = UserAccount.objects.filter(pk=id).first()  # Szukamy użytkownika po ID
     if not user:
-        raise UserNotFoundException()
-    serializer = UserAccountSerializer(user)
+        raise UserNotFoundException()  # Jeśli nie znaleziono, rzucamy wyjątek
+    serializer = UserAccountSerializer(user)  # Serializujemy pojedynczego użytkownika
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
 
 @swagger_auto_schema(
     method='post',
@@ -75,15 +86,18 @@ def get_user(request, id):
     }
 )
 @api_view(['POST'])
-@permission_classes([AllowAny])
+@permission_classes([AllowAny])  # Dostępne bez logowania
 def register_user(request):
+    # Pobieramy dane z requestu
     email = request.data.get('email')
     login = request.data.get('login')
     password = request.data.get('password')
 
+    # Walidacja: sprawdzamy, czy wszystkie pola są obecne
     if not email or not login or not password:
         raise MissingFieldsException()
 
+    # Sprawdzamy, czy email lub login są już zajęte
     if UserAccount.objects.filter(email=email).exists():
         raise EmailExistsException()
     if UserAccount.objects.filter(login=login).exists():
@@ -91,14 +105,26 @@ def register_user(request):
 
     try:
         user = UserAccount.objects.create_user(email=email, login=login, password=password)
-        refresh = RefreshToken.for_user(user)
-        return Response({
-            "message": "Użytkownik zarejestrowany pomyślnie!",
-            "access": str(refresh.access_token),
-            "refresh": str(refresh),
-        }, status=status.HTTP_201_CREATED)
     except Exception:
         raise RegistrationFailedException()
+
+    # Zadanie mailowe
+    try:
+        send_registration_email.delay(email)
+    except Exception as e:
+        print(f"Błąd Celery: {e}")
+
+    # JWT token
+    refresh = RefreshToken.for_user(user)
+
+    return Response({
+        "message": "Użytkownik zarejestrowany pomyślnie!",
+        "access": str(refresh.access_token),
+        "refresh": str(refresh),
+    }, status=status.HTTP_201_CREATED)
+
+
+
 
 @swagger_auto_schema(
     method='post',
@@ -120,18 +146,23 @@ def register_user(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login_user(request):
+    # Pobranie danych logowania z requestu
     email = request.data.get('email')
     password = request.data.get('password')
 
+    # Walidacja pól
     if not email or not password:
         raise MissingFieldsException()
 
+    # Próba uwierzytelnienia użytkownika
     user = authenticate(request=request, email=email, password=password)
 
+    # Jeśli uwierzytelnienie się nie powiedzie
     if user is None:
         raise InvalidCredentialsException()
 
     try:
+        # Generowanie tokenów JWT
         refresh = RefreshToken.for_user(user)
         return Response({
             "access": str(refresh.access_token),
