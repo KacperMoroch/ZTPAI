@@ -176,3 +176,19 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = "api.UserAccount"
 
+# Celery ustawienia
+CELERY_BROKER_URL = 'amqp://guest:guest@rabbitmq:5672//'
+CELERY_RESULT_BACKEND = 'django-db'
+
+INSTALLED_APPS += [
+    'django_celery_results',
+]
+
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'goaldle.noreply@gmail.com'
+EMAIL_HOST_PASSWORD = 'mgpi zsao knga lpfe'
