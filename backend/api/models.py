@@ -141,3 +141,14 @@ class Player(models.Model):
 
     def __str__(self):
         return self.name
+
+class UserPlayerAssignment(models.Model):
+    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
+    player = models.ForeignKey(Player, on_delete=models.CASCADE)
+    assignment_date = models.DateField()
+
+class UserGuessLog(models.Model):
+    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
+    guess_date = models.DateField()
+    guess_number = models.IntegerField(default=0)
+    guessed_correctly = models.BooleanField(default=False)
