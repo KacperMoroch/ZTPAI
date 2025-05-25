@@ -17,152 +17,80 @@ import {
     Box,
     Button,
 } from "@mui/material";
+
+import Navbar from "../components/Navbar";
+
+// Komponenty do ładowania i obsługi błędów
 import Loading from "../components/Loading";
 import ErrorComponent from "../components/Error";
+
+// Pomocnicze funkcje do uwierzytelniania i odświeżania tokena
 import { fetchWithRefresh } from "../utils/fetchWithRefresh";
 import { isLoggedIn, logout } from "../utils/auth";
 
 const Home = () => {
+    // Stan na dane piłkarzy, status ładowania i ewentualny błąd
     const [players, setPlayers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    // Hook nawigacyjny
     const navigate = useNavigate();
 
+    // Funkcja pobierająca dane piłkarzy z API
     const fetchData = async () => {
         setLoading(true);
         setError(null);
 
         try {
+            // Pobieranie danych z API z użyciem funkcji obsługującej odświeżanie tokena
             const playersData = await fetchWithRefresh("http://127.0.0.1:8000/api/players/");
             setPlayers(playersData);
         } catch (err) {
+            // Obsługa błędu podczas pobierania
             setError(err.message);
         } finally {
             setLoading(false);
         }
     };
 
-
+    // Hook uruchamiany po załadowaniu komponentu
     useEffect(() => {
+        // Sprawdzenie, czy użytkownik jest zalogowany — jeśli nie, przekierowanie do logowania
         if (!isLoggedIn()) {
             navigate("/login");
             return;
         }
 
+        // Pobieranie danych
         fetchData();
     }, [navigate]);
 
+    // Jeżeli trwa ładowanie – pokaż komponent ładowania
     if (loading) return <Loading />;
+
+    // Jeżeli wystąpił błąd – pokaż komponent błędu
     if (error) return <ErrorComponent message={error} />;
 
     return (
         <>
             {/* Navbar */}
-            <AppBar position="static" sx={{ bgcolor: "#1976d2", marginBottom: 0 }}>
-                <Toolbar sx={{ justifyContent: "space-between" }}>
-                    <Typography variant="h6" component="div" sx={{ fontWeight: "bold" }}>
-                        GOALDLE
-                    </Typography>
-                    <Box sx={{ display: "flex", alignItems: "center", ml: 0, justifyContent: "flex-start" }}>
-                        <Button
-                            color="inherit"
-                            component={Link}
-                            to="/login"
-                            sx={{
-                                ml: 1,
-                                '&:hover': {
-                                    backgroundColor: '#1565c0',
-                                    color: '#fff',
-                                },
-                            }}
-                        >
-                            Logowanie
-                        </Button>
-                        <Button
-                            color="inherit"
-                            component={Link}
-                            to="/register"
-                            sx={{
-                                ml: 2,
-                                '&:hover': {
-                                    backgroundColor: '#1565c0',
-                                    color: '#fff',
-                                },
-                            }}
-                        >
-                            Rejestracja
-                        </Button>
-                        <Button
-                            color="inherit"
-                            component={Link}
-                            to="/profile"
-                            sx={{
-                                ml: 2,
-                                '&:hover': {
-                                    backgroundColor: '#1565c0',
-                                    color: '#fff',
-                                },
-                            }}
-                        >
-                            Twój profil
-                        </Button>
-
-                        {/* Panel administratora – widoczny tylko dla superusera */}
-                        {sessionStorage.getItem("is_superuser") === "True" && (
-                            <Button
-                                color="inherit"
-                                component={Link}
-                                to="/admin"
-                                sx={{
-                                    ml: 2,
-                                    '&:hover': {
-                                        backgroundColor: '#1565c0',
-                                        color: '#fff',
-                                    },
-                                }}
-                            >
-                                Panel administratora
-                            </Button>
-                        )}
-
-                        <Button
-                            color="inherit"
-                            component={Link}
-                            to="/settings"
-                            sx={{
-                                ml: 2,
-                                '&:hover': {
-                                    backgroundColor: '#1565c0',
-                                    color: '#fff',
-                                },
-                            }}
-                        >
-                            Ustawienia
-                        </Button>
-                        <Button
-                            color="inherit"
-                            onClick={logout}
-                            sx={{
-                                ml: 2,
-                                mr: 6,
-                                '&:hover': {
-                                    backgroundColor: '#1565c0',
-                                    color: '#fff',
-                                },
-                            }}
-                        >
-                            Wyloguj się
-                        </Button>
-                    </Box>
-                </Toolbar>
-            </AppBar>
+            <Navbar />
 
             <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", width: "100vw", textAlign: "center", padding: "20px", bgcolor: "#30d1f6" }}>
                 <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", maxWidth: "900px", width: "100%" }}>
                     {/* Sekcja ładowania i błędów */}
                     {loading && <CircularProgress />}
                     {error && <Alert severity="error">{error}</Alert>}
-
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        component={Link}
+                        to="/guess_player"
+                        sx={{ marginBottom: 2 }}
+                    >
+                        Zgadnij piłkarza
+                    </Button>
                     {/* Przycisk odświeżania */}
                     <Button
                         variant="contained"
