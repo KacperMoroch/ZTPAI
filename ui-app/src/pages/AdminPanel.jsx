@@ -7,11 +7,14 @@ import { useNavigate, Link } from "react-router-dom";
 import { fetchWithRefresh } from "../utils/fetchWithRefresh";
 
 const AdminPanel = () => {
+    // Stan na listę użytkowników, stan ładowania oraz błąd
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    // Hook do nawigacji
     const navigate = useNavigate();
 
+    // Funkcja pobierająca użytkowników z API
     const fetchUsers = async () => {
         setLoading(true);
         setError(null);
@@ -20,21 +23,27 @@ const AdminPanel = () => {
             const usersData = await fetchWithRefresh("http://127.0.0.1:8000/api/users/");
             setUsers(usersData);
         } catch (err) {
+            // Obsługa błędu
             setError(err.message);
         } finally {
+            // Wyłączenie stanu ładowania
             setLoading(false);
         }
     };
 
+    // Hook useEffect uruchamiający się po załadowaniu komponentu
     useEffect(() => {
+        // Sprawdzanie, czy użytkownik jest zalogowany i czy jest superużytkownikiem
         const token = sessionStorage.getItem("token");
         const isSuperuser = sessionStorage.getItem("is_superuser");
 
+        // Jeśli nie ma tokena lub użytkownik nie jest superużytkownikiem, przekieruj na stronę główną
         if (!token || isSuperuser !== "True") {
             navigate("/");
             return;
         }
 
+        // Pobieranie użytkowników
         fetchUsers();
     }, [navigate]);
 
