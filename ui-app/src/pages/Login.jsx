@@ -5,38 +5,46 @@ import { useNavigate } from "react-router-dom";
 import backgroundImage from '../assets/tlo_login.jpg';
 
 const Login = () => {
+    // Stany do przechowywania danych formularza logowania
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const navigate = useNavigate();
 
+    const navigate = useNavigate(); // Hook do nawigacji
+
+    // Obsługa wysyłania formularza logowania
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError("");
+        e.preventDefault(); // Zapobiega przeładowaniu strony
+        setError(""); // Resetowanie błędu
 
         try {
+            // Wysłanie danych logowania do backendu
             const response = await axios.post("http://127.0.0.1:8000/api/login/", { email, password });
+
+            // Odbiór danych z odpowiedzi
             const { access, refresh, is_superuser, message } = response.data;
 
+            // Jeżeli otrzymano token, zapisujemy dane do sessionStorage i przekierowujemy do strony głównej
             if (access) {
                 sessionStorage.setItem("token", access);
                 sessionStorage.setItem("refresh", refresh);
                 sessionStorage.setItem("is_superuser", is_superuser);
                 console.log(message || "Zalogowano pomyślnie.");
-                navigate("/");
+                navigate("/"); // Przejście do strony głównej
             } else {
+                // Obsługa przypadku, gdy nie otrzymano tokena
                 setError("Błąd: brak tokena w odpowiedzi");
             }
         } catch (error) {
+            // Obsługa błędów z serwera (np. błędne dane logowania)
             if (error.response) {
                 setError(error.response.data.error || "Nieprawidłowe dane logowania!");
             } else {
+                // Obsługa błędów połączenia
                 setError("Błąd połączenia z serwerem!");
             }
         }
     };
-
-
 
 
     return (
