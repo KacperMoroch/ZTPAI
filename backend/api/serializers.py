@@ -1,9 +1,10 @@
 from rest_framework import serializers
-from .models import Player, Role, UserAccount, Country, League, Club, Position, Age, ShirtNumber
+from .models import Player, Role, UserAccount, Country, League, Club, Position, Age, ShirtNumber, UserGuessLog, UserPlayerAssignment
 
 
 # serializer dla pikarzy
 class PlayerSerializer(serializers.ModelSerializer):
+    # pobieramy dane
     country_name = serializers.CharField(source="country.name", read_only=True)
     league_name = serializers.CharField(source="league.name", read_only=True)
     club_name = serializers.CharField(source="club.name", read_only=True)
@@ -13,7 +14,9 @@ class PlayerSerializer(serializers.ModelSerializer):
 
 
     class Meta:
+        # ten serializer bazuje na modelu Player
         model = Player
+        # 'fields' określa, które pola zostaną zwrócone przez API.
         fields = ['id', 'name', 'country_name', 'league_name', 'club_name', 'position_name', 'age_value', 'shirt_number_value']
 
 
@@ -64,3 +67,21 @@ class ShirtNumberSerializer(serializers.ModelSerializer):
     class Meta:
         model = ShirtNumber
         fields = '__all__'
+
+# serializer dla przypisania użytkownika do gracza
+class UserPlayerAssignmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserPlayerAssignment
+        fields = '__all__'
+
+# serializer dla logu zgadywania użytkownika
+class UserGuessLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserGuessLog
+        fields = '__all__'
+
+# serializer zwracający tylko nazwe zawodnika
+class PlayerNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Player
+        fields = ['name']
