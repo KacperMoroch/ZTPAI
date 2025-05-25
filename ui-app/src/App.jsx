@@ -5,6 +5,8 @@ import Register from "./pages/Register";
 import UserDetails from "./pages/UserDetails";
 import AdminPanel from "./pages/AdminPanel";
 import PrivateRoute from "./components/PrivateRoute";
+import GuessPlayerPage from './pages/GuessPlayerPage';
+import SettingsPage from './pages/SettingsPage';
 
 const App = () => {
   return (
@@ -16,6 +18,8 @@ const App = () => {
           </PrivateRoute>
         } />
 
+        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/guess_player" element={<GuessPlayerPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/users/:id" element={
