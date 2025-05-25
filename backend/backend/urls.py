@@ -18,6 +18,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path # import funkcji `path` do definiowania tras URL
 
+from api.views.settings import delete_account, get_settings, update_account
+from api.views.guess_player import check_guess, get_player_names, get_game_status
+
+
 from api.views.users import get_all_users, get_user, register_user, login_user 
 from api.views.players import get_all_players, get_player
 from api.views.roles import get_roles
@@ -60,26 +64,44 @@ urlpatterns = [
     # ścieżka do logowania użytkownika za pomocą JWT
     path('api/login/', login_user, name='login_user'),
 
+    # endpoint do odświeżenia tokenu JWT
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+
+    path('api/guess/', check_guess, name='check_guess'),
+    path('api/player-names/', get_player_names,name='get_player_names'),
+    path('api/game-status/', get_game_status, name='get_game_status'),
+
+
+    path('api/settings', get_settings, name='get_settings'),
+    path('api/updateAccount', update_account, name='update_account'),
+    path('api/deleteAccount', delete_account, name='delete_account'),
 
 
 ]
 
+# Konfiguracja dokumentacji Swagger / ReDoc
 schema_view = get_schema_view(
    openapi.Info(
-      title="Goaldle API",  
+      title="Goaldle API",  # Nazwa API
       default_version='v1',
       description="Dokumentacja API dla Goaldle",
-      terms_of_service="https://www.example.com/terms/",
-      contact=openapi.Contact(email="kontakt@example.com"),
-      license=openapi.License(name="MIT License"),
+      terms_of_service="https://www.example.com/terms/",  # Link do regulaminu
+      contact=openapi.Contact(email="kontakt@example.com"),  # Kontakt do autora
+      license=openapi.License(name="MIT License"),  # Informacja o licencji
    ),
    public=True,
-   permission_classes=(permissions.AllowAny,),
+   permission_classes=(permissions.AllowAny,),  # Dokumentacja dostępna publicznie
 )
 
+# Dodanie ścieżek do interfejsów dokumentacji API
 urlpatterns += [
-    path('api/docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),   # Swagger UI
-    path('api/redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),         # ReDoc UI
-    path('api/swagger.json', schema_view.without_ui(cache_timeout=0), name='schema-json'),          # surowy OpenAPI JSON
+    # Swagger UI (graficzna dokumentacja API)
+    path('api/docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+
+    # ReDoc UI (alternatywna dokumentacja)
+    path('api/redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+
+    # Surowy plik JSON z opisem API (do integracji lub eksportu)
+    path('api/swagger.json', schema_view.without_ui(cache_timeout=0), name='schema-json'),
 ]
