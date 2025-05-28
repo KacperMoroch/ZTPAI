@@ -18,6 +18,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path # import funkcji `path` do definiowania tras URL
 
+from api.views.profile import user_profile
+
 from api.views.settings import delete_account, get_settings, update_account
 from api.views.guess_player import check_guess, get_player_names, get_game_status
 
@@ -76,6 +78,8 @@ urlpatterns = [
     path('api/settings', get_settings, name='get_settings'),
     path('api/updateAccount', update_account, name='update_account'),
     path('api/deleteAccount', delete_account, name='delete_account'),
+
+    path('api/profile/', user_profile, name='user_profile'),
 
 
 ]
