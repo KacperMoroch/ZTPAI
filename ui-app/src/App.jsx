@@ -7,6 +7,7 @@ import AdminPanel from "./pages/AdminPanel";
 import PrivateRoute from "./components/PrivateRoute";
 import GuessPlayerPage from './pages/GuessPlayerPage';
 import SettingsPage from './pages/SettingsPage';
+import Profile from './pages/Profile';
 
 const App = () => {
   return (
@@ -17,7 +18,7 @@ const App = () => {
             <Home />
           </PrivateRoute>
         } />
-
+        <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/guess_player" element={<GuessPlayerPage />} />
         <Route path="/login" element={<Login />} />
