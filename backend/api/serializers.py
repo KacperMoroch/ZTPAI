@@ -85,3 +85,18 @@ class PlayerNameSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
         fields = ['name']
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    points_guess = serializers.SerializerMethodField()
+    points_transfer = serializers.SerializerMethodField()
+
+    class Meta:
+        model = UserAccount
+        fields = ['id', 'login', 'email', 'created_at', 'points_guess', 'points_transfer']
+
+    def get_points_guess(self, obj):
+        return UserGuessLog.objects.filter(user=obj, guessed_correctly=True).count()
+
+    def get_points_transfer(self, obj):
+        # trzeba dorobić logikę dla punktów transferowych
+        return 0
