@@ -18,7 +18,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path # import funkcji `path` do definiowania tras URL
 
-from api.views.profile import user_profile
+from api.views.guess_transfer import guess_transfer_player, start_transfer_game
+from api.views.admin_panel import user_detail
+from api.views.profile import user_profile  
 
 from api.views.settings import delete_account, get_settings, update_account
 from api.views.guess_player import check_guess, get_player_names, get_game_status
@@ -48,8 +50,8 @@ urlpatterns = [
     # ścieżka do pobrania listy wszystkich użytkowników
     path('api/users/', get_all_users, name='get_all_users'),
 
-    # scieżka do pobrania konkretnego użytkownika po ID
-    path('api/users/<int:id>/', get_user, name='get_user'),
+    # # scieżka do pobrania konkretnego użytkownika po ID
+    # path('api/users/<int:id>/', get_user, name='get_user'),
 
     # ścieżka do pobrania listy wszystkich piłkarzy
     path('api/players/', get_all_players, name='get_all_players'),
@@ -81,6 +83,11 @@ urlpatterns = [
 
     path('api/profile/', user_profile, name='user_profile'),
 
+    path('api/users/<int:id>/', user_detail, name='user_detail'),
+
+
+    path('api/transfer/start', start_transfer_game, name='start_transfer_game'),
+    path('api/transfer/guess', guess_transfer_player, name='guess_transfer_player'),
 
 ]
 
