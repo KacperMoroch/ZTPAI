@@ -84,73 +84,103 @@ const SettingsPage = () => {
 
             <Box
                 sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
+                    pt: "64px",
+                    bgcolor: "#30d1f6",
                     minHeight: "100vh",
                     width: "100vw",
-                    textAlign: "center",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "flex-start",
                     padding: "20px",
-                    bgcolor: "#30d1f6",
                 }}
             >
                 <Box
                     sx={{
-                        maxWidth: "500px",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        maxWidth: "800px",
                         width: "100%",
-                        padding: "40px",
-                        backgroundColor: "#fff",
-                        borderRadius: "8px",
-                        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-                        fontFamily: "Arial, sans-serif",
-                        color: "black"
+                        bgcolor: "#1976d2",
+                        borderRadius: "12px",
+                        overflow: "hidden",
+                        boxShadow: 3,
+                        minHeight: "300px",
+                        mt: 4,
+                        height: "100%",
                     }}
                 >
-                    <Typography variant="h4" gutterBottom sx={{ color: "black" }}>
-                        Ustawienia konta
-                    </Typography>
-                    <Typography variant="subtitle1" gutterBottom sx={{ color: "black" }}>
-                        Witaj, {originalUser.login}!
-                    </Typography>
-
-                    {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-                    {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
-
-                    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column" }}>
-                        <TextField
-                            label="Login"
-                            name="login"
-                            value={user.login}
-                            onChange={handleChange}
-                            required
-                            sx={{ mb: 2, input: { color: "black" }, label: { color: "black" } }}
-                        />
-                        <TextField
-                            label="E-mail"
-                            name="email"
-                            type="email"
-                            value={user.email}
-                            onChange={handleChange}
-                            required
-                            sx={{ mb: 2, input: { color: "black" }, label: { color: "black" } }}
-                        />
-                        <Button type="submit" variant="contained" color="primary">
-                            Zaktualizuj
-                        </Button>
-                    </form>
-
-                    <Button
-                        variant="contained"
-                        color="error"
-                        onClick={handleDelete}
-                        sx={{ mt: 2 }}
+                    <Box
+                        sx={{
+                            maxWidth: "600px",
+                            width: "100%",
+                            padding: "40px",
+                            backgroundColor: "#fff",
+                            borderRadius: "12px",
+                            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                            fontFamily: "Arial, sans-serif",
+                            color: "black",
+                            minHeight: "300px",
+                            height: "100%",
+                            justifyContent: "center",
+                        }}
                     >
-                        Usuń konto
-                    </Button>
+                        <Typography
+                            variant="h4"
+                            gutterBottom
+                            sx={{ color: "black", textAlign: "center" }}
+                        >
+                            Ustawienia konta
+                        </Typography>
+
+                        <Typography
+                            variant="h6"
+                            gutterBottom
+                            sx={{ color: "black", textAlign: "center", fontWeight: "bold" }}
+                        >
+                            Witaj, {originalUser.login}!
+                        </Typography>
+
+                        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+                        {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+
+                        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column" }}>
+                            <TextField
+                                label="Login"
+                                name="login"
+                                value={user.login}
+                                onChange={handleChange}
+                                required
+                                sx={{ mb: 2, input: { color: "black" }, label: { color: "black" } }}
+                            />
+                            <TextField
+                                label="E-mail"
+                                name="email"
+                                type="email"
+                                value={user.email}
+                                onChange={handleChange}
+                                required
+                                sx={{ mb: 2, input: { color: "black" }, label: { color: "black" } }}
+                            />
+                            <Button type="submit" variant="contained" color="primary">
+                                Zaktualizuj
+                            </Button>
+                        </form>
+
+                        <Button
+                            variant="contained"
+                            color="error"
+                            onClick={handleDelete}
+                            sx={{ mt: 2, display: "block", mx: "auto" }}
+                        >
+                            Usuń konto
+                        </Button>
+                    </Box>
                 </Box>
             </Box>
         </>
     );
+
 };
 
 export default SettingsPage;
