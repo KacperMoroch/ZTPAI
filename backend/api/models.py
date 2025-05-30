@@ -46,7 +46,7 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
     login = models.CharField(max_length=50, unique=True)
     enabled = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    profile_picture = models.BinaryField(null=True, blank=True)
     # atrybuty wymagane do panelu admina
     is_staff = models.BooleanField(default=False) 
     is_superuser = models.BooleanField(default=False)  
