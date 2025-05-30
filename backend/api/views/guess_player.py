@@ -2,11 +2,10 @@ from datetime import date
 from django.db.models import F
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import api_view, permission_classes
-
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 import random
 
@@ -31,6 +30,8 @@ def compare_values(val1, val2):
         return 'equal'
 
 @api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def check_guess(request):
     player_name = request.data.get('player_name', '').strip()
     if not player_name:
@@ -129,18 +130,22 @@ def check_guess(request):
     })
 
 @api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def get_player_names(request):
     query = request.GET.get('query', '').strip()
 
     if query:
         players = Player.objects.filter(name__istartswith=query)[:10]
     else:
-        players = Player.objects.order_by('?')[:10]  # fallback dla pustego inputu
+        players = Player.objects.order_by('?')[:10]  
 
     serializer = PlayerNameSerializer(players, many=True)
     return Response({'players': [p['name'] for p in serializer.data]})
 
 @api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def get_game_status(request):
     user = request.user
     today = date.today()
