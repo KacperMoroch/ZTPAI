@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
-    AppBar,
-    Toolbar,
     Typography,
     Table,
     TableBody,
@@ -19,14 +16,13 @@ import {
 } from "@mui/material";
 
 import Navbar from "../components/Navbar";
-
 // Komponenty do ładowania i obsługi błędów
 import Loading from "../components/Loading";
 import ErrorComponent from "../components/Error";
 
 // Pomocnicze funkcje do uwierzytelniania i odświeżania tokena
 import { fetchWithRefresh } from "../utils/fetchWithRefresh";
-import { isLoggedIn, logout } from "../utils/auth";
+import { isLoggedIn } from "../utils/auth";
 
 const Home = () => {
     // Stan na dane piłkarzy, status ładowania i ewentualny błąd
@@ -41,7 +37,6 @@ const Home = () => {
     const fetchData = async () => {
         setLoading(true);
         setError(null);
-
         try {
             // Pobieranie danych z API z użyciem funkcji obsługującej odświeżanie tokena
             const playersData = await fetchWithRefresh("http://127.0.0.1:8000/api/players/");
@@ -77,36 +72,114 @@ const Home = () => {
             {/* Navbar */}
             <Navbar />
 
-            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", width: "100vw", textAlign: "center", padding: "20px", bgcolor: "#30d1f6" }}>
-                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", maxWidth: "900px", width: "100%" }}>
-                    {/* Sekcja ładowania i błędów */}
-                    {loading && <CircularProgress />}
-                    {error && <Alert severity="error">{error}</Alert>}
+            <Box
+                sx={{
+                    pt: "64px",
+                    bgcolor: "#30d1f6",
+                    minHeight: "100vh",
+                    width: "100vw",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "flex-start",
+                    padding: "20px",
+                }}
+            >
+                <Box
+                    sx={{
+                        maxWidth: "900px",
+                        width: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        bgcolor: "#fff",
+                        borderRadius: 2,
+                        padding: 3,
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                        mt: 4,
+                    }}
+                >
                     <Button
                         variant="contained"
-                        color="secondary"
                         component={Link}
                         to="/guess_player"
-                        sx={{ marginBottom: 2 }}
+                        sx={{
+                            marginBottom: 2,
+                            color: "#fff",
+                            width: "250px",
+                            height: "50px",
+                            fontSize: "1.2rem",
+                            backgroundColor: "#6a1b9a",
+                            '&:hover': {
+                                backgroundColor: '#4a148c',
+                                color: '#fff',
+                            },
+                        }}
                     >
                         Zgadnij piłkarza
                     </Button>
-                    {/* Przycisk odświeżania */}
+
                     <Button
                         variant="contained"
-                        color="primary"
-                        sx={{ marginBottom: 2 }}
-                        onClick={() => fetchData(sessionStorage.getItem("token"))}
+                        component={Link}
+                        to="/guess_transfer"
+                        sx={{
+                            marginBottom: 2,
+                            color: "#fff",
+                            width: "250px",
+                            height: "50px",
+                            fontSize: "1.2rem",
+                            backgroundColor: "#2e7d32",
+                            '&:hover': {
+                                backgroundColor: '#1b5e20',
+                                color: '#fff',
+                            },
+                        }}
                     >
-                        Odśwież dane
+                        Zgadnij transfer
                     </Button>
 
 
+                    <Box
+                        sx={{
+                            width: "100%",
+                            backgroundColor: "#e3f2fd",
+                            padding: 3,
+                            borderRadius: 2,
+                            boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
+                            mt: 4,
 
-                    {/* Tabela piłkarzy */}
-                    <Typography variant="h5" sx={{ marginBottom: 2, marginTop: 4, color: "black" }}>Lista piłkarzy</Typography>
-                    <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
-                        <TableContainer component={Paper} sx={{ width: "100%" }}>
+                        }}
+                    >
+                        <Box
+                            sx={{
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                marginBottom: 3,
+                            }}
+                        >
+                            <Typography variant="h5" sx={{ marginBottom: 2, color: "black" }}>
+                                Lista piłkarzy
+                            </Typography>
+
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={() => fetchData(sessionStorage.getItem("token"))}
+                            >
+                                Odśwież dane
+                            </Button>
+                        </Box>
+
+                        <TableContainer
+                            component={Paper}
+                            sx={{
+                                backgroundColor: "#ffffff",
+                                borderRadius: 4,
+                                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+                            }}
+                        >
                             <Table>
                                 <TableHead>
                                     <TableRow>
@@ -120,8 +193,13 @@ const Home = () => {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {players.map((player) => (
-                                        <TableRow key={player.id}>
+                                    {players.map((player, index) => (
+                                        <TableRow
+                                            key={player.id}
+                                            sx={{
+                                                backgroundColor: index % 2 === 0 ? "#f5f5f5" : "#ffffff",
+                                            }}
+                                        >
                                             <TableCell align="center">{player.name}</TableCell>
                                             <TableCell align="center">{player.club_name}</TableCell>
                                             <TableCell align="center">{player.league_name}</TableCell>
@@ -135,8 +213,10 @@ const Home = () => {
                             </Table>
                         </TableContainer>
                     </Box>
+
+
                 </Box>
-            </Box>
+            </Box >
         </>
     );
 };
