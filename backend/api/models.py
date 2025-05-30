@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin  
 from django.db import models  
 from django.core.exceptions import ValidationError  
@@ -152,3 +153,32 @@ class UserGuessLog(models.Model):
     guess_date = models.DateField()
     guess_number = models.IntegerField(default=0)
     guessed_correctly = models.BooleanField(default=False)
+
+class Transfer(models.Model):
+    player = models.ForeignKey(Player, on_delete=models.CASCADE)
+    from_club = models.ForeignKey(Club, related_name='transfers_from', on_delete=models.CASCADE)
+    to_club = models.ForeignKey(Club, related_name='transfers_to', on_delete=models.CASCADE)
+    transfer_amount = models.DecimalField(max_digits=12, decimal_places=2)
+    date = models.DateField()
+
+    def __str__(self):
+        return f"{self.player.name}: {self.from_club.name} ➜ {self.to_club.name} ({self.transfer_amount}M)"
+
+class TransferQuestionOfTheDay(models.Model):
+    transfer = models.ForeignKey(Transfer, on_delete=models.CASCADE)
+    question_date = models.DateField(default=timezone.now, unique=True)
+
+    def __str__(self):
+        return f"Pytanie dnia: {self.question_date} - {self.transfer}"
+
+class UserGuessLogTransfer(models.Model):
+    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
+    guess_date = models.DateField()
+    guess_number = models.IntegerField(default=0)
+    guessed_correctly = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('user', 'guess_date')
+
+    def __str__(self):
+        return f"{self.user.login} - {self.guess_date} ({'✔' if self.guessed_correctly else '✘'})"
