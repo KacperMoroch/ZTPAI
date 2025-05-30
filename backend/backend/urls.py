@@ -20,7 +20,7 @@ from django.urls import path # import funkcji `path` do definiowania tras URL
 
 from api.views.guess_transfer import guess_transfer_player, start_transfer_game
 from api.views.admin_panel import user_detail
-from api.views.profile import user_profile  
+from api.views.profile import upload_profile_picture, user_profile  
 
 from api.views.settings import delete_account, get_settings, update_account
 from api.views.guess_player import check_guess, get_player_names, get_game_status
@@ -85,9 +85,10 @@ urlpatterns = [
 
     path('api/users/<int:id>/', user_detail, name='user_detail'),
 
-
     path('api/transfer/start', start_transfer_game, name='start_transfer_game'),
     path('api/transfer/guess', guess_transfer_player, name='guess_transfer_player'),
+
+    path('api/profile/upload-picture/', upload_profile_picture,name='upload_profile_picture'),
 
 ]
 
