@@ -12,38 +12,29 @@ const Navbar = () => {
     return (
         <AppBar position="static" sx={{ bgcolor: "#1976d2", marginBottom: 0 }}>
             <Toolbar sx={{ justifyContent: "space-between" }}>
-                <Typography variant="h6" component="div" sx={{ fontWeight: "bold" }}>
+                <Button
+                    component={Link}
+                    to="/"
+                    sx={{
+                        fontWeight: "bold",
+                        fontSize: "1.5rem",
+                        color: "#fff",
+                        textTransform: "none",
+                        background: "linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)",
+                        borderRadius: 2,
+                        padding: "4px 20px",
+                        boxShadow: "0 3px 5px 2px rgba(33, 203, 243, .3)",
+                        cursor: "pointer",
+                        '&:hover': {
+                            background: "linear-gradient(45deg, #1e88e5 30%, #1de9b6 90%)",
+                            color: "#a7ffeb",
+                        },
+                    }}
+                >
                     GOALDLE
-                </Typography>
+                </Button>
+
                 <Box sx={{ display: "flex", alignItems: "center", ml: 0, justifyContent: "flex-start" }}>
-                    <Button
-                        color="inherit"
-                        component={Link}
-                        to="/login"
-                        sx={{
-                            ml: 1,
-                            '&:hover': {
-                                backgroundColor: '#1565c0',
-                                color: '#fff',
-                            },
-                        }}
-                    >
-                        Logowanie
-                    </Button>
-                    <Button
-                        color="inherit"
-                        component={Link}
-                        to="/register"
-                        sx={{
-                            ml: 2,
-                            '&:hover': {
-                                backgroundColor: '#1565c0',
-                                color: '#fff',
-                            },
-                        }}
-                    >
-                        Rejestracja
-                    </Button>
                     <Button
                         color="inherit"
                         component={Link}
