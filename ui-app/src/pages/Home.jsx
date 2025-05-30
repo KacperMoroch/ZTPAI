@@ -86,135 +86,150 @@ const Home = () => {
             >
                 <Box
                     sx={{
-                        maxWidth: "900px",
-                        width: "100%",
                         display: "flex",
                         flexDirection: "column",
                         alignItems: "center",
-                        bgcolor: "#fff",
-                        borderRadius: 2,
-                        padding: 3,
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                        maxWidth: "1100px",
+                        width: "100%",
+                        bgcolor: "#1976d2",
+                        borderRadius: "12px",
+                        overflow: "hidden",
+                        boxShadow: 3,
+                        minHeight: "100%",
                         mt: 4,
                     }}
                 >
-                    <Button
-                        variant="contained"
-                        component={Link}
-                        to="/guess_player"
-                        sx={{
-                            marginBottom: 2,
-                            color: "#fff",
-                            width: "250px",
-                            height: "50px",
-                            fontSize: "1.2rem",
-                            backgroundColor: "#6a1b9a",
-                            '&:hover': {
-                                backgroundColor: '#4a148c',
-                                color: '#fff',
-                            },
-                        }}
-                    >
-                        Zgadnij piłkarza
-                    </Button>
-
-                    <Button
-                        variant="contained"
-                        component={Link}
-                        to="/guess_transfer"
-                        sx={{
-                            marginBottom: 2,
-                            color: "#fff",
-                            width: "250px",
-                            height: "50px",
-                            fontSize: "1.2rem",
-                            backgroundColor: "#2e7d32",
-                            '&:hover': {
-                                backgroundColor: '#1b5e20',
-                                color: '#fff',
-                            },
-                        }}
-                    >
-                        Zgadnij transfer
-                    </Button>
-
-
                     <Box
                         sx={{
+                            maxWidth: "900px",
                             width: "100%",
-                            backgroundColor: "#e3f2fd",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            bgcolor: "#fff",
+                            borderRadius: "12px",
                             padding: 3,
-                            borderRadius: 2,
-                            boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
-                            mt: 4,
-
+                            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                            minHeight: "300px",
                         }}
                     >
+                        <Button
+                            variant="contained"
+                            component={Link}
+                            to="/guess_player"
+                            sx={{
+                                marginBottom: 2,
+                                color: "#fff",
+                                width: "250px",
+                                height: "50px",
+                                fontSize: "1.2rem",
+                                backgroundColor: "#6a1b9a",
+                                '&:hover': {
+                                    backgroundColor: '#4a148c',
+                                    color: '#fff',
+                                },
+                            }}
+                        >
+                            Zgadnij piłkarza
+                        </Button>
+
+                        <Button
+                            variant="contained"
+                            component={Link}
+                            to="/guess_transfer"
+                            sx={{
+                                marginBottom: 2,
+                                color: "#fff",
+                                width: "250px",
+                                height: "50px",
+                                fontSize: "1.2rem",
+                                backgroundColor: "#2e7d32",
+                                '&:hover': {
+                                    backgroundColor: '#1b5e20',
+                                    color: '#fff',
+                                },
+                            }}
+                        >
+                            Zgadnij transfer
+                        </Button>
+
+
                         <Box
                             sx={{
-                                display: "flex",
-                                flexDirection: "column",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                marginBottom: 3,
+                                width: "100%",
+                                backgroundColor: "#e3f2fd",
+                                padding: 3,
+                                borderRadius: 2,
+                                boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
+                                mt: 4,
+
                             }}
                         >
-                            <Typography variant="h5" sx={{ marginBottom: 2, color: "black" }}>
-                                Lista piłkarzy
-                            </Typography>
-
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={() => fetchData(sessionStorage.getItem("token"))}
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    marginBottom: 3,
+                                }}
                             >
-                                Odśwież dane
-                            </Button>
+                                <Typography variant="h5" sx={{ marginBottom: 2, color: "black" }}>
+                                    Lista piłkarzy
+                                </Typography>
+
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={() => fetchData(sessionStorage.getItem("token"))}
+                                >
+                                    Odśwież dane
+                                </Button>
+                            </Box>
+
+                            <TableContainer
+                                component={Paper}
+                                sx={{
+                                    backgroundColor: "#ffffff",
+                                    borderRadius: 4,
+                                    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+                                }}
+                            >
+                                <Table>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell align="center"><strong>Imię</strong></TableCell>
+                                            <TableCell align="center"><strong>Klub</strong></TableCell>
+                                            <TableCell align="center"><strong>Liga</strong></TableCell>
+                                            <TableCell align="center"><strong>Kraj</strong></TableCell>
+                                            <TableCell align="center"><strong>Pozycja</strong></TableCell>
+                                            <TableCell align="center"><strong>Wiek</strong></TableCell>
+                                            <TableCell align="center"><strong>Numer</strong></TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {players.map((player, index) => (
+                                            <TableRow
+                                                key={player.id}
+                                                sx={{
+                                                    backgroundColor: index % 2 === 0 ? "#f5f5f5" : "#ffffff",
+                                                }}
+                                            >
+                                                <TableCell align="center">{player.name}</TableCell>
+                                                <TableCell align="center">{player.club_name}</TableCell>
+                                                <TableCell align="center">{player.league_name}</TableCell>
+                                                <TableCell align="center">{player.country_name}</TableCell>
+                                                <TableCell align="center">{player.position_name}</TableCell>
+                                                <TableCell align="center">{player.age_value}</TableCell>
+                                                <TableCell align="center">{player.shirt_number_value}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
                         </Box>
 
-                        <TableContainer
-                            component={Paper}
-                            sx={{
-                                backgroundColor: "#ffffff",
-                                borderRadius: 4,
-                                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
-                            }}
-                        >
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell align="center"><strong>Imię</strong></TableCell>
-                                        <TableCell align="center"><strong>Klub</strong></TableCell>
-                                        <TableCell align="center"><strong>Liga</strong></TableCell>
-                                        <TableCell align="center"><strong>Kraj</strong></TableCell>
-                                        <TableCell align="center"><strong>Pozycja</strong></TableCell>
-                                        <TableCell align="center"><strong>Wiek</strong></TableCell>
-                                        <TableCell align="center"><strong>Numer</strong></TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {players.map((player, index) => (
-                                        <TableRow
-                                            key={player.id}
-                                            sx={{
-                                                backgroundColor: index % 2 === 0 ? "#f5f5f5" : "#ffffff",
-                                            }}
-                                        >
-                                            <TableCell align="center">{player.name}</TableCell>
-                                            <TableCell align="center">{player.club_name}</TableCell>
-                                            <TableCell align="center">{player.league_name}</TableCell>
-                                            <TableCell align="center">{player.country_name}</TableCell>
-                                            <TableCell align="center">{player.position_name}</TableCell>
-                                            <TableCell align="center">{player.age_value}</TableCell>
-                                            <TableCell align="center">{player.shirt_number_value}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                    </Box>
-
-
+                    </Box >
                 </Box>
             </Box >
         </>
