@@ -75,15 +75,14 @@ const AdminPanel = () => {
             <Navbar />
             <Box
                 sx={{
+                    pt: "64px",
+                    bgcolor: "#30d1f6",
+                    minHeight: "100vh",
+                    width: "100vw",
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "flex-start",
-                    minHeight: "100vh",
-                    width: "100vw",
-                    textAlign: "center",
-                    padding: "10px",
-                    bgcolor: "#30d1f6",
-                    pt: 5,
+                    padding: "20px",
                 }}
             >
                 <Box
@@ -98,6 +97,7 @@ const AdminPanel = () => {
                         overflow: "hidden",
                         boxShadow: 3,
                         minHeight: "300px",
+                        mt: 4,
                     }}
                 >
                     <Paper
