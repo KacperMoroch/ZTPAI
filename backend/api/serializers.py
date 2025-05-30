@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Player, Role, UserAccount, Country, League, Club, Position, Age, ShirtNumber, UserGuessLog, UserPlayerAssignment
+from .models import Player, Role, Transfer, TransferQuestionOfTheDay, UserAccount, Country, League, Club, Position, Age, ShirtNumber, UserGuessLog, UserGuessLogTransfer, UserPlayerAssignment
 
 
 # serializer dla pikarzy
@@ -98,5 +98,28 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return UserGuessLog.objects.filter(user=obj, guessed_correctly=True).count()
 
     def get_points_transfer(self, obj):
-        # trzeba dorobić logikę dla punktów transferowych
-        return 0
+        return UserGuessLogTransfer.objects.filter(user=obj, guessed_correctly=True).count()
+    
+# serializer dla transferów
+class TransferSerializer(serializers.ModelSerializer):
+    player_name = serializers.CharField(source='player.name', read_only=True)
+    from_club_name = serializers.CharField(source='from_club.name', read_only=True)
+    to_club_name = serializers.CharField(source='to_club.name', read_only=True)
+
+    class Meta:
+        model = Transfer
+        fields = ['id', 'player', 'player_name', 'from_club', 'from_club_name', 'to_club', 'to_club_name', 'transfer_amount', 'date']
+
+# serializer dla pytania dnia o transfer
+class TransferQuestionOfTheDaySerializer(serializers.ModelSerializer):
+    transfer_details = TransferSerializer(source='transfer', read_only=True)
+
+    class Meta:
+        model = TransferQuestionOfTheDay
+        fields = ['id', 'transfer', 'transfer_details', 'question_date']
+
+# serializer dla logów zgadywania transferów
+class UserGuessLogTransferSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserGuessLogTransfer
+        fields = '__all__'
