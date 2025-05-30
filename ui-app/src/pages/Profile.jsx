@@ -8,6 +8,7 @@ import {
     Avatar,
     Tooltip,
     Paper,
+    Button,
 } from "@mui/material";
 import { fetchWithRefresh } from "../utils/fetchWithRefresh";
 import Navbar from "../components/Navbar";
@@ -23,22 +24,51 @@ const Profile = () => {
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [uploading, setUploading] = useState(false);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const data = await fetchWithRefresh("http://127.0.0.1:8000/api/profile/");
-                setProfile(data);
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
+    const fetchProfile = async () => {
+        try {
+            const data = await fetchWithRefresh("http://127.0.0.1:8000/api/profile/");
+            setProfile(data);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchProfile();
     }, []);
+
+    const handleFileChange = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("image", file);
+
+        setUploading(true);
+        try {
+            const data = await fetchWithRefresh("http://127.0.0.1:8000/api/profile/upload-picture/", {
+                method: "POST",
+                body: formData,
+            });
+
+            if (data?.success) {
+                await fetchProfile();
+            } else {
+                console.error(data);
+                alert("Błąd przy przesyłaniu zdjęcia.");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Błąd sieci przy przesyłaniu zdjęcia.");
+        } finally {
+            setUploading(false);
+        }
+    };
 
     const points_guess = profile?.points_guess ?? 0;
     const points_transfer = profile?.points_transfer ?? 0;
@@ -90,13 +120,11 @@ const Profile = () => {
                                     width: "56px",
                                     height: "56px",
                                     position: "relative",
-                                    top: "5.7px",
-                                    left: "1.5px",
+                                    top: "4px",
+                                    left: "1px",
                                 }}
                             />
                         </Box>
-
-
                     </Tooltip>
                 ))}
             </Box>
@@ -146,53 +174,99 @@ const Profile = () => {
             <Navbar />
             <Box
                 sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
+                    pt: "64px",
+                    bgcolor: "#30d1f6",
                     minHeight: "100vh",
                     width: "100vw",
-                    textAlign: "center",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "flex-start",
                     padding: "20px",
-                    bgcolor: "#30d1f6",
                 }}
             >
-                <Paper
-                    elevation={6}
+                <Box
                     sx={{
                         display: "flex",
                         flexDirection: "column",
                         alignItems: "center",
                         maxWidth: "800px",
                         width: "100%",
-                        padding: 4,
-                        borderRadius: 4,
-                        backgroundColor: "white",
+                        bgcolor: "#1976d2",
+                        borderRadius: "12px",
+                        overflow: "hidden",
+                        boxShadow: 3,
+                        minHeight: "300px",
+                        mt: 4,
                     }}
                 >
-                    <Typography variant="h4" gutterBottom>
-                        Witaj, {profile.login}!
-                    </Typography>
-                    <Typography variant="subtitle1">
-                        Konto założone: {new Date(profile.created_at).toLocaleDateString()}
-                    </Typography>
-                    <Typography variant="h6" sx={{ mt: 3 }}>
-                        Łączna liczba punktów:{" "}
-                        <strong style={{ color: "#1976d2" }}>{total_points}</strong>
-                    </Typography>
-                    <Typography variant="body1">
-                        ({points_guess} za <em>Zgadnij piłkarza</em>, {points_transfer} za <em>Zgadnij transfer</em>)
-                    </Typography>
-
-                    <Box sx={{ mt: 4, width: "100%" }}>
-                        <Typography variant="h6" gutterBottom>
-                            Osiągnięcia:
+                    <Paper
+                        sx={{
+                            padding: "30px",
+                            width: "100%",
+                            maxWidth: "600px",
+                            alignItems: "center",
+                            flexDirection: "column",
+                            display: "flex",
+                            minHeight: "300px",
+                            textAlign: "center",
+                            borderRadius: "12px",
+                        }}
+                    >
+                        {/* zawartość profilu */}
+                        <Typography variant="h4" gutterBottom>
+                            Witaj, {profile.login}!
                         </Typography>
-                        {renderAchievements()}
-                    </Box>
-                </Paper>
+                        <Typography variant="subtitle1">
+                            Konto założone: {new Date(profile.created_at).toLocaleDateString()}
+                        </Typography>
+
+                        <Avatar
+                            sx={{ width: 100, height: 100, mb: 2, mt: 1 }}
+                            src={
+                                profile.profile_picture
+                                    ? `data:image/jpeg;base64,${profile.profile_picture}`
+                                    : undefined
+                            }
+                            alt={profile.login}
+                        />
+                        <Button
+                            variant="contained"
+                            component="label"
+                            disabled={uploading}
+                            sx={{ mb: 0.1 }}
+                        >
+                            {uploading ? "Wysyłanie..." : "Zmień zdjęcie profilowe"}
+                            <input
+                                hidden
+                                accept="image/*"
+                                type="file"
+                                onChange={handleFileChange}
+                            />
+                        </Button>
+
+                        <Typography variant="h6" sx={{ mt: 2 }}>
+                            Łączna liczba punktów:{" "}
+                            <strong style={{ color: "#1976d2" }}>{total_points}</strong>
+                        </Typography>
+                        <Typography variant="body1">
+                            ({points_guess} za <em>Zgadnij piłkarza</em>, {points_transfer} za <em>Zgadnij transfer</em>)
+                        </Typography>
+
+                        <Box sx={{ mt: 2, width: "100%", display: "flex", flexDirection: "column", alignItems: "center" }}>
+                            <Typography
+                                variant="h6"
+                                gutterBottom
+                                sx={{ textAlign: "center", fontWeight: "bold" }}
+                            >
+                                Osiągnięcia:
+                            </Typography>
+                            {renderAchievements()}
+                        </Box>
+                    </Paper>
+                </Box>
             </Box>
         </>
     );
-};
+}
 
 export default Profile;
