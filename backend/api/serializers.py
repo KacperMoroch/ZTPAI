@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Player, Role, Transfer, TransferQuestionOfTheDay, UserAccount, Country, League, Club, Position, Age, ShirtNumber, UserGuessLog, UserGuessLogTransfer, UserPlayerAssignment
-
+import base64
 
 # serializer dla pikarzy
 class PlayerSerializer(serializers.ModelSerializer):
@@ -89,10 +89,16 @@ class PlayerNameSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     points_guess = serializers.SerializerMethodField()
     points_transfer = serializers.SerializerMethodField()
+    profile_picture = serializers.SerializerMethodField()
 
     class Meta:
         model = UserAccount
-        fields = ['id', 'login', 'email', 'created_at', 'points_guess', 'points_transfer']
+        fields = ['id', 'login', 'email', 'created_at', 'points_guess', 'points_transfer', 'profile_picture']
+
+    def get_profile_picture(self, obj):
+        if obj.profile_picture:
+            return base64.b64encode(obj.profile_picture).decode('utf-8')
+        return None
 
     def get_points_guess(self, obj):
         return UserGuessLog.objects.filter(user=obj, guessed_correctly=True).count()
