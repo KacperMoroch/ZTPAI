@@ -207,6 +207,11 @@ const GuessPlayerPage = () => {
                                         variant="outlined"
                                         required
                                         sx={{ backgroundColor: "#fff", borderRadius: 1 }}
+                                        onFocus={() => {
+                                            if (playerOptions.length === 0) {
+                                                fetchSuggestions("");
+                                            }
+                                        }}
                                     />
                                 )}
                             />
