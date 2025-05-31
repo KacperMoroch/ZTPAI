@@ -3,6 +3,7 @@ import axios from "axios";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import backgroundImage from '../assets/tlo_login.jpg';
+import mobileBackgroundImage from '../assets/mobile_login.jpg';
 
 const Login = () => {
     // Stany do przechowywania danych formularza logowania
@@ -62,6 +63,9 @@ const Login = () => {
                 backgroundSize: "cover",
                 backgroundRepeat: "no-repeat",
                 backgroundAttachment: "fixed",
+                "@media (max-width: 600px) and (orientation: portrait)": {
+                    backgroundImage: `url(${mobileBackgroundImage})`,
+                },
             }}
         >
             <Box
@@ -73,12 +77,17 @@ const Login = () => {
                     borderRadius: "10px",
                     marginTop: "18%",
                     "@media (max-width: 852px)": {
-                        width: "50%",
-                        padding: "15px",
+                        width: "60%",
+                        padding: "20px",
+                    },
+                    "@media (max-width: 852px) and (max-height: 500px)": {
+                        width: "80%",
+                        padding: "10px",
+                        transform: "scale(0.6)",
                     },
                     "@media (max-width: 480px)": {
                         width: "100%",
-                    }
+                    },
                 }}
             >
                 <Typography
