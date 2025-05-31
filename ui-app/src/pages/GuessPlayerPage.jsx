@@ -143,24 +143,24 @@ const GuessPlayerPage = () => {
                     minHeight: "100vh",
                     width: "100vw",
                     bgcolor: "#30d1f6",
+                    //overflowX: "hidden",
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
-                    pt: 4,
-                    pb: 4,
-                    px: 2,
+                    padding: "20px",
                 }}
             >
                 <Typography
                     variant="h3"
                     fontWeight={600}
                     sx={{
-                        textAlign: "center",
-                        fontSize: { xs: "1.4rem", md: "2.3rem" },
+                        textAlign: { xs: "center", sm: "center" },
+                        fontSize: { xs: "1.5rem", sm: "2rem", md: "2.3rem" },
                         color: "#0078A0",
                         textShadow: "1px 1px 2px rgba(0,0,0,0.2)",
-                        px: 8,
+                        px: { xs: 2, md: 8 },
                         mb: 4,
+                        // wordBreak: "break-word",
                     }}
                 >
                     Zgadnij piłkarza z TOP 5 lig europejskich
@@ -170,21 +170,25 @@ const GuessPlayerPage = () => {
                     sx={{
                         display: "flex",
                         flexDirection: { xs: "column", md: "row" },
-                        gap: 4,
+                        gap: { xs: 3.3, md: 8 },
                         justifyContent: "center",
-                        alignItems: "flex-start",
+                        alignItems: { xs: "center", md: "flex-start" },
                         width: "100%",
                         maxWidth: "1200px",
+                        // px: { xs: 0, sm: 2 },
                     }}
                 >
                     <Paper
                         elevation={4}
                         sx={{
-                            p: 3,
+                            p: { xs: 2, sm: 3 },
                             backgroundColor: "#0078A0",
                             color: "#fff",
-                            width: '100%',
-                            maxWidth: 400,
+                            width: "100%",
+                            maxWidth: { xs: 320, sm: 400 },
+                            //mx: "auto",
+
+                            alignSelf: { xs: "center", sm: "center" },
                         }}
                     >
                         <Typography variant="h5" align="center" gutterBottom>
@@ -219,14 +223,17 @@ const GuessPlayerPage = () => {
                                 type="submit"
                                 variant="contained"
                                 fullWidth
-                                sx={{ mt: 2 }}
+                                sx={{ mt: 2, py: 1.5, fontSize: { xs: "0.9rem", sm: "1rem" } }}
                                 disabled={gameOver || loading}
                             >
                                 Zgadnij
                             </Button>
                         </form>
 
-                        <Typography variant="subtitle1" sx={{ mt: 2 }}>
+                        <Typography
+                            variant="subtitle1"
+                            sx={{ mt: 2, textAlign: "center", display: "block", width: "100%" }}
+                        >
                             Pozostałe próby: {remaining}
                         </Typography>
 
@@ -247,20 +254,21 @@ const GuessPlayerPage = () => {
                         <Paper
                             elevation={4}
                             sx={{
-                                p: 1.5,
+                                p: { xs: 1, sm: 1.5 },
                                 backgroundColor: "#00698c",
                                 borderRadius: 2,
-                                width: '100%',
-                                maxWidth: 400,
-                                maxHeight: 345,
-                                overflowY: 'auto',
+                                width: "100%",
+                                maxWidth: { xs: 337, sm: 400 },
+                                maxHeight: { xs: "50vh", sm: "345px" },
+                                overflowY: "auto",
+
                             }}
                         >
                             {guesses.map((guess, index) => (
                                 <Box
                                     key={index}
                                     sx={{
-                                        p: 2,
+                                        p: { xs: 1, sm: 2 },
                                         mb: 2,
                                         border: "1px solid #ccc",
                                         borderRadius: 2,
