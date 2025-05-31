@@ -121,7 +121,7 @@ const GuessTransfer = () => {
 
                     setMessage({
                         type: "warning",
-                        text: `Nie masz więcej prób. Piłkarzem był: ${response.correct_player}`,
+                        text: `Nie masz więcej prób. Piłkarzem do zgadnięcia był: ${response.correct_player}`,
                     });
                 } else {
                     setMessage({
@@ -148,9 +148,7 @@ const GuessTransfer = () => {
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
-                    pt: 4,
-                    pb: 4,
-                    px: 2,
+                    padding: "20px",
                 }}
             >
                 <Box
@@ -179,7 +177,12 @@ const GuessTransfer = () => {
 
                     <Paper
                         elevation={6}
-                        sx={{ padding: 3, maxWidth: 400, width: "100%", textAlign: "center" }}
+                        sx={{
+                            padding: { xs: 2, md: 3 },
+                            maxWidth: { xs: 300, md: 400 },
+                            width: "100%",
+                            textAlign: "center"
+                        }}
                     >
                         <Typography variant="h5" mb={2}>
                             Zgadnij transfer
