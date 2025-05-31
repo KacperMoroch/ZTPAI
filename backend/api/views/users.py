@@ -28,7 +28,10 @@ from api.permissions import IsAdminUserCustom
     method='get',
     operation_description="Pobierz listę wszystkich użytkowników",
     responses={
-        200: openapi.Response(description="Lista użytkowników"),
+        200: openapi.Response(
+            description="Lista użytkowników",
+            schema=UserAccountSerializer(many=True)
+        ),
         204: "Brak użytkowników",
         500: "Błąd serwera"
     }
@@ -50,9 +53,12 @@ def get_all_users(request):
     method='get',
     operation_description="Pobierz dane użytkownika po ID",
     responses={
-        200: openapi.Response(description="Dane użytkownika"),
-        404: "Użytkownik nie znaleziony"
-    }
+    200: openapi.Response(
+        description="Dane użytkownika",
+        schema=UserAccountSerializer()
+    ),
+    404: "Użytkownik nie znaleziony"
+}
 )
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated, IsAdminUserCustom])
@@ -80,10 +86,20 @@ def get_user(request, id):
         },
     ),
     responses={
-        201: openapi.Response(description="Użytkownik zarejestrowany"),
-        400: "Błąd walidacji",
-        500: "Błąd serwera"
-    }
+    201: openapi.Response(
+        description="Użytkownik zarejestrowany",
+        schema=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'message': openapi.Schema(type=openapi.TYPE_STRING),
+                'access': openapi.Schema(type=openapi.TYPE_STRING, description='JWT access token'),
+                'refresh': openapi.Schema(type=openapi.TYPE_STRING, description='JWT refresh token'),
+            }
+        )
+    ),
+    400: openapi.Response(description="Błąd walidacji"),
+    500: openapi.Response(description="Błąd serwera")
+}
 )
 @api_view(['POST'])
 @permission_classes([AllowAny])  # Dostępne bez logowania
@@ -138,10 +154,22 @@ def register_user(request):
         },
     ),
     responses={
-        200: openapi.Response(description="Zalogowano pomyślnie"),
-        400: "Brak wymaganych danych",
-        401: "Nieprawidłowe dane logowania"
-    }
+    200: openapi.Response(
+        description="Zalogowano pomyślnie",
+        schema=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'message': openapi.Schema(type=openapi.TYPE_STRING),
+                'access': openapi.Schema(type=openapi.TYPE_STRING, description='JWT access token'),
+                'refresh': openapi.Schema(type=openapi.TYPE_STRING, description='JWT refresh token'),
+                'is_superuser': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='Czy użytkownik ma uprawnienia administratora')
+
+            }
+        )
+    ),
+    400: openapi.Response(description="Brak wymaganych danych"),
+    401: openapi.Response(description="Nieprawidłowe dane logowania")
+}
 )
 @api_view(['POST'])
 @permission_classes([AllowAny])
