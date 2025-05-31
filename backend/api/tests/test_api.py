@@ -572,3 +572,63 @@ def test_check_guess_incorrect_guess_with_remaining_attempts(user_auth_client, u
     player_data = data.get('player_data', {})
     assert player_data.get('name') == guessed_player.name
     assert 'matches' in data
+
+
+
+
+
+
+
+
+
+
+@pytest.mark.django_db
+def test_get_user_detail_as_admin(auth_client, user):
+    url = f'/api/users/{user.id}/'
+    response = auth_client.get(url)
+
+    assert response.status_code == 200
+    assert response.data['id'] == user.id
+    assert response.data['email'] == user.email
+    assert response.data['login'] == user.login
+
+
+@pytest.mark.django_db
+def test_get_user_detail_not_found(auth_client):
+    url = f'/api/users/9999/' 
+    response = auth_client.get(url)
+
+    assert response.status_code == 404
+    assert 'error' in response.data
+
+
+@pytest.mark.django_db
+def test_delete_user_as_admin(auth_client, user):
+    url = f'/api/users/{user.id}/'
+    response = auth_client.delete(url)
+
+    assert response.status_code == 200
+    assert response.data['success'] is True
+    assert response.data['message'] == 'Użytkownik został usunięty.'
+
+    assert not UserAccount.objects.filter(id=user.id).exists()
+
+
+@pytest.mark.django_db
+def test_delete_user_not_found(auth_client):
+    url = f'/api/users/9999/'
+    response = auth_client.delete(url)
+
+    assert response.status_code == 404
+    assert 'error' in response.data
+
+
+@pytest.mark.django_db
+def test_user_detail_non_admin_forbidden(user_auth_client, user):
+    url = f'/api/users/{user.id}/'
+
+    response = user_auth_client.get(url)
+    assert response.status_code == 403
+
+    response = user_auth_client.delete(url)
+    assert response.status_code == 403
