@@ -1,12 +1,43 @@
 from django.http import JsonResponse
 from django.db import IntegrityError
-import json
+from django.core.exceptions import ValidationError
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.response import Response
-from django.core.exceptions import ValidationError
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from ..exceptions import (
+    InvalidLoginException,
+    InvalidEmailException,
+    EmailTakenException,
+    LoginTakenException,
+    AccountUpdateFailedException
+)
 
+
+@swagger_auto_schema(
+    method='get',
+    operation_description="Pobiera dane aktualnie zalogowanego użytkownika.",
+    responses={
+        200: openapi.Response(
+            description="Dane użytkownika",
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'user': openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            'login': openapi.Schema(type=openapi.TYPE_STRING),
+                            'email': openapi.Schema(type=openapi.TYPE_STRING),
+                        }
+                    )
+                }
+            )
+        ),
+        401: openapi.Response(description="Brak autoryzacji")
+    }
+)
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -19,6 +50,40 @@ def get_settings(request):
         }
     })
 
+
+
+@swagger_auto_schema(
+    method='post',
+    operation_description="Aktualizuje dane konta użytkownika (login i email).",
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        required=['login', 'email'],
+        properties={
+            'login': openapi.Schema(type=openapi.TYPE_STRING, description='Nowy login'),
+            'email': openapi.Schema(type=openapi.TYPE_STRING, description='Nowy adres email'),
+        }
+    ),
+    responses={
+        200: openapi.Response(
+            description="Zaktualizowano dane",
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'success': openapi.Schema(type=openapi.TYPE_STRING),
+                    'user': openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            'login': openapi.Schema(type=openapi.TYPE_STRING),
+                            'email': openapi.Schema(type=openapi.TYPE_STRING),
+                        }
+                    )
+                }
+            )
+        ),
+        400: openapi.Response(description="Nieprawidłowe dane lub konflikt login/email"),
+        500: openapi.Response(description="Błąd aktualizacji konta")
+    }
+)
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -28,10 +93,10 @@ def update_account(request):
     email = data.get('email')
 
     if not login or len(login) < 4:
-        return Response({'error': 'Login musi mieć co najmniej 4 znaki!'})
+        raise InvalidLoginException()
 
     if not email or '@' not in email:
-        return Response({'error': 'Niepoprawny adres e-mail!'})
+        raise InvalidEmailException()
 
     user = request.user
     user.login = login
@@ -41,22 +106,19 @@ def update_account(request):
         user.full_clean()
         user.save()
     except ValidationError as e:
-        error_messages = []
         for field, messages in e.message_dict.items():
             for msg in messages:
                 if 'email' in field and 'already exists' in msg.lower():
-                    error_messages.append("Ten E-mail jest już zajęty.")
+                    raise EmailTakenException()
                 elif 'login' in field and 'already exists' in msg.lower():
-                    error_messages.append("Login jest już zajęty.")
-                else:
-                    error_messages.append(msg)
-        return Response({'error': ' '.join(error_messages)})
+                    raise LoginTakenException()
+        raise AccountUpdateFailedException(detail=' '.join([msg for m in e.message_dict.values() for msg in m]))
 
     except IntegrityError:
-        return Response({'error': 'Podany e-mail lub login jest już zajęty!'})
+        raise AccountUpdateFailedException(detail="Podany e-mail lub login jest już zajęty!")
 
     except Exception as e:
-        return Response({'error': f'Wystąpił błąd: {str(e)}'})
+        raise AccountUpdateFailedException(detail=f'Wystąpił błąd: {str(e)}')
 
     return Response({
         'success': 'Dane zostały pomyślnie zaktualizowane!',
@@ -66,10 +128,29 @@ def update_account(request):
         }
     })
 
+
+
+
+@swagger_auto_schema(
+    method='post',
+    operation_description="Usuwa konto aktualnie zalogowanego użytkownika.",
+    responses={
+        200: openapi.Response(
+            description="Konto zostało usunięte",
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'success': openapi.Schema(type=openapi.TYPE_BOOLEAN)
+                }
+            )
+        ),
+        401: openapi.Response(description="Brak autoryzacji")
+    }
+)
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def delete_account(request):
     user = request.user
     user.delete()
-    return JsonResponse({'success': True})
+    return Response({'success': True})
