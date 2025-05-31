@@ -151,7 +151,7 @@ const SettingsPage = () => {
                                 value={user.login}
                                 onChange={handleChange}
                                 required
-                                sx={{ mb: 2, input: { color: "black" }, label: { color: "black" } }}
+                                sx={{ mb: 2, input: { color: "black" }, label: { color: "black" }, width: { xs: "90%", sm: "90%" }, mx: { xs: "auto", sm: "auto" }, }}
                             />
                             <TextField
                                 label="E-mail"
@@ -160,9 +160,19 @@ const SettingsPage = () => {
                                 value={user.email}
                                 onChange={handleChange}
                                 required
-                                sx={{ mb: 2, input: { color: "black" }, label: { color: "black" } }}
+                                sx={{ mb: 2, input: { color: "black" }, label: { color: "black" }, width: { xs: "90%", sm: "90%" }, mx: { xs: "auto", sm: "auto" }, }}
                             />
-                            <Button type="submit" variant="contained" color="primary">
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                color="primary"
+                                sx={{
+                                    width: { xs: '60%', sm: '70%' },
+                                    mx: { xs: 'auto', sm: 'auto' },
+                                    display: 'block',
+                                    mb: 2,
+                                }}
+                            >
                                 Zaktualizuj
                             </Button>
                         </form>
