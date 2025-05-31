@@ -17,7 +17,6 @@ const UserDetails = () => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
     useEffect(() => {
         const token = sessionStorage.getItem("token");
         const isSuperuser = sessionStorage.getItem("is_superuser");
@@ -33,9 +32,14 @@ const UserDetails = () => {
 
             try {
                 const userData = await fetchWithRefresh(`http://127.0.0.1:8000/api/users/${id}/`);
-                setUser(userData);
+
+                if (userData.error) {
+                    setError(userData.error);
+                } else {
+                    setUser(userData);
+                }
             } catch (err) {
-                setError(err.message);
+                setError("Wystąpił błąd po stronie klienta.");
             } finally {
                 setLoading(false);
             }
