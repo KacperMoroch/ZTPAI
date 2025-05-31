@@ -3,37 +3,47 @@ import axios from "axios";
 import { Box, Button, Typography, TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import backgroundImage from '../assets/tlo_register.jpg';
+import mobileBackgroundImage from '../assets/mobile_registration.jpg';
 
 const Register = () => {
+    // Stany do przechowywania danych z formularza rejestracji
     const [email, setEmail] = useState("");
     const [login, setLogin] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
-    const navigate = useNavigate();
 
+    const navigate = useNavigate(); // Hook do nawigacji po stronie
+
+    // Funkcja obsługująca wysłanie formularza rejestracyjnego
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        e.preventDefault(); // Zapobiega przeładowaniu strony
 
+        // Sprawdzenie, czy hasła są identyczne
         if (password !== confirmPassword) {
             setError("Hasła nie są takie same!");
             return;
         }
 
+        // Dane użytkownika do wysłania na backend
         const userData = { email, login, password };
 
         try {
+            // Wysłanie danych do API rejestracji
             const response = await axios.post("http://127.0.0.1:8000/api/register/", userData);
             console.log("Rejestracja udana:", response.data);
-            navigate("/login"); // przekierowanie po rejestracji
+            navigate("/login"); // Przekierowanie do strony logowania po sukcesie
         } catch (error) {
+            // Obsługa błędów odpowiedzi z serwera
             if (error.response) {
                 setError(error.response.data.error || "Wystąpił błąd podczas rejestracji!");
             } else {
+                // Obsługa błędów połączenia
                 setError("Błąd połączenia z serwerem!");
             }
         }
     };
+
 
     return (
         <Box
@@ -51,6 +61,9 @@ const Register = () => {
                 backgroundSize: "cover",
                 backgroundRepeat: "no-repeat",
                 backgroundAttachment: "fixed",
+                "@media (max-width: 600px) and (orientation: portrait)": {
+                    backgroundImage: `url(${mobileBackgroundImage})`,
+                },
             }}
         >
             <Box
@@ -63,11 +76,16 @@ const Register = () => {
                     marginTop: "8%",
                     "@media (max-width: 852px)": {
                         width: "50%",
-                        padding: "15px",
+                        padding: "20px",
+                    },
+                    "@media (max-width: 852px) and (max-height: 500px)": {
+                        width: "100%",
+                        padding: "10px",
+                        transform: "scale(0.55)",
                     },
                     "@media (max-width: 480px)": {
                         width: "100%",
-                    }
+                    },
                 }}
             >
                 <Typography
