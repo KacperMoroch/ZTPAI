@@ -9,10 +9,10 @@ import {
     TableHead,
     TableRow,
     Paper,
-    CircularProgress,
-    Alert,
     Box,
     Button,
+    TextField,
+    MenuItem
 } from "@mui/material";
 
 import Navbar from "../components/Navbar";
@@ -30,35 +30,82 @@ const Home = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // stany do paginacji
+    const [page, setPage] = useState(1);
+    const [count, setCount] = useState(0);
+    const [next, setNext] = useState(null);
+    const [previous, setPrevious] = useState(null);
+
+    const [country, setCountry] = useState("");
+    const [league, setLeague] = useState("");
+    const [position, setPosition] = useState("");
+    const [sort, setSort] = useState("name");
+
+    const [availableCountries, setAvailableCountries] = useState([]);
+    const [availableLeagues, setAvailableLeagues] = useState([]);
+    const [availablePositions, setAvailablePositions] = useState([]);
+
     // Hook nawigacyjny
     const navigate = useNavigate();
 
+    const fetchFilters = async () => {
+        try {
+            const data = await fetchWithRefresh("http://127.0.0.1:8000/api/filters/");
+            setAvailableCountries([...data.countries].sort());
+            setAvailableLeagues([...data.leagues].sort());
+            setAvailablePositions([...data.positions].sort());
+        } catch (err) {
+            console.error("Błąd podczas pobierania filtrów:", err);
+        }
+    };
+
     // Funkcja pobierająca dane piłkarzy z API
-    const fetchData = async () => {
+    const fetchData = async (pageNumber = 1) => {
         setLoading(true);
         setError(null);
         try {
-            // Pobieranie danych z API z użyciem funkcji obsługującej odświeżanie tokena
-            const playersData = await fetchWithRefresh("http://127.0.0.1:8000/api/players/");
-            setPlayers(playersData);
+            const params = new URLSearchParams({
+                page: pageNumber.toString(),
+                country,
+                league,
+                position,
+                sort,
+            });
+
+            const url = `http://127.0.0.1:8000/api/players/?${params.toString()}`;
+            const data = await fetchWithRefresh(url);
+            setPlayers(data.results);
+            setCount(data.count);
+            setNext(data.next);
+            setPrevious(data.previous);
+            setPage(pageNumber);
         } catch (err) {
-            // Obsługa błędu podczas pobierania
             setError(err.message);
         } finally {
             setLoading(false);
         }
     };
-
+    const resetFiltersAndRefresh = () => {
+        setCountry("");
+        setLeague("");
+        setPosition("");
+        setSort("name");
+    };
+    useEffect(() => {
+        // Wywołuj fetchData tylko, jeśli wszystkie filtry są puste i sort jest "name"
+        if (country === "" && league === "" && position === "" && sort === "name") {
+            fetchData(1);
+        }
+    }, [country, league, position, sort]);
     // Hook uruchamiany po załadowaniu komponentu
     useEffect(() => {
-        // Sprawdzenie, czy użytkownik jest zalogowany — jeśli nie, przekierowanie do logowania
         if (!isLoggedIn()) {
             navigate("/login");
             return;
         }
 
-        // Pobieranie danych
-        fetchData();
+        fetchData(1);
+        fetchFilters();
     }, [navigate]);
 
     // Jeżeli trwa ładowanie – pokaż komponent ładowania
@@ -69,7 +116,6 @@ const Home = () => {
 
     return (
         <>
-            {/* Navbar */}
             <Navbar />
 
             <Box
@@ -153,7 +199,6 @@ const Home = () => {
                             Zgadnij transfer
                         </Button>
 
-
                         <Box
                             sx={{
                                 width: "100%",
@@ -177,11 +222,95 @@ const Home = () => {
                                 <Typography variant="h5" sx={{ marginBottom: 2, color: "black" }}>
                                     Lista piłkarzy
                                 </Typography>
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        gap: 2,
+                                        flexWrap: "wrap",
+                                        marginBottom: 2,
+                                        justifyContent: "center",
+                                    }}
+                                >
+                                    <TextField
+                                        select
+                                        label="Kraj"
+                                        value={country}
+                                        onChange={(e) => setCountry(e.target.value)}
+                                        size="small"
+                                        sx={{
+                                            minWidth: 180,
+                                            backgroundColor: '#fff',
+                                            borderRadius: 1,
+                                        }}
+                                    >
+                                        <MenuItem value="">Wszystkie kraje</MenuItem>
+                                        {availableCountries.map((c) => (
+                                            <MenuItem key={c} value={c}>{c}</MenuItem>
+                                        ))}
+                                    </TextField>
+
+                                    <TextField
+                                        select
+                                        label="Liga"
+                                        value={league}
+                                        onChange={(e) => setLeague(e.target.value)}
+                                        size="small"
+                                        sx={{
+                                            minWidth: 180,
+                                            backgroundColor: '#fff',
+                                            borderRadius: 1,
+                                        }}
+                                    >
+                                        <MenuItem value="">Wszystkie ligi</MenuItem>
+                                        {availableLeagues.map((l) => (
+                                            <MenuItem key={l} value={l}>{l}</MenuItem>
+                                        ))}
+                                    </TextField>
+
+                                    <TextField
+                                        select
+                                        label="Pozycja"
+                                        value={position}
+                                        onChange={(e) => setPosition(e.target.value)}
+                                        size="small"
+                                        sx={{
+                                            minWidth: 180,
+                                            backgroundColor: '#fff',
+                                            borderRadius: 1,
+                                        }}
+                                    >
+                                        <MenuItem value="">Wszystkie pozycje</MenuItem>
+                                        {availablePositions.map((p) => (
+                                            <MenuItem key={p} value={p}>{p}</MenuItem>
+                                        ))}
+                                    </TextField>
+
+                                    <TextField
+                                        select
+                                        label="Sortowanie"
+                                        value={sort}
+                                        onChange={(e) => setSort(e.target.value)}
+                                        size="small"
+                                        sx={{
+                                            minWidth: 180,
+                                            backgroundColor: '#fff',
+                                            borderRadius: 1,
+                                        }}
+                                    >
+                                        <MenuItem value="name">Imię rosnąco</MenuItem>
+                                        <MenuItem value="-name">Imię malejąco</MenuItem>
+                                        <MenuItem value="age__value">Wiek rosnąco</MenuItem>
+                                        <MenuItem value="-age__value">Wiek malejąco</MenuItem>
+                                    </TextField>
+                                    <Button variant="contained" onClick={() => fetchData(1)}>
+                                        Zastosuj
+                                    </Button>
+                                </Box>
 
                                 <Button
                                     variant="contained"
                                     color="primary"
-                                    onClick={() => fetchData(sessionStorage.getItem("token"))}
+                                    onClick={resetFiltersAndRefresh}
                                 >
                                     Odśwież dane
                                 </Button>
@@ -208,30 +337,61 @@ const Home = () => {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {players.map((player, index) => (
-                                            <TableRow
-                                                key={player.id}
-                                                sx={{
-                                                    backgroundColor: index % 2 === 0 ? "#f5f5f5" : "#ffffff",
-                                                }}
-                                            >
-                                                <TableCell align="center">{player.name}</TableCell>
-                                                <TableCell align="center">{player.club_name}</TableCell>
-                                                <TableCell align="center">{player.league_name}</TableCell>
-                                                <TableCell align="center">{player.country_name}</TableCell>
-                                                <TableCell align="center">{player.position_name}</TableCell>
-                                                <TableCell align="center">{player.age_value}</TableCell>
-                                                <TableCell align="center">{player.shirt_number_value}</TableCell>
+                                        {players.length === 0 ? (
+                                            <TableRow>
+                                                <TableCell colSpan={7} align="center">
+                                                    Nie znaleziono piłkarzy dla wybranych filtrów.
+                                                </TableCell>
                                             </TableRow>
-                                        ))}
+                                        ) : (
+                                            players.map((player, index) => (
+                                                <TableRow
+                                                    key={player.id}
+                                                    sx={{
+                                                        backgroundColor: index % 2 === 0 ? "#f5f5f5" : "#ffffff",
+                                                    }}
+                                                >
+                                                    <TableCell align="center">{player.name}</TableCell>
+                                                    <TableCell align="center">{player.club_name}</TableCell>
+                                                    <TableCell align="center">{player.league_name}</TableCell>
+                                                    <TableCell align="center">{player.country_name}</TableCell>
+                                                    <TableCell align="center">{player.position_name}</TableCell>
+                                                    <TableCell align="center">{player.age_value}</TableCell>
+                                                    <TableCell align="center">{player.shirt_number_value}</TableCell>
+                                                </TableRow>
+                                            ))
+                                        )}
                                     </TableBody>
                                 </Table>
                             </TableContainer>
-                        </Box>
 
-                    </Box >
+                            <Box sx={{ display: "flex", justifyContent: "center", marginTop: 2 }}>
+                                <Button
+                                    variant="outlined"
+                                    onClick={() => fetchData(page - 1)}
+                                    disabled={!previous}
+                                    sx={{ marginRight: 1 }}
+                                >
+                                    Poprzednia
+                                </Button>
+                                {count > 0 && (
+                                    <Typography sx={{ alignSelf: "center", mx: 1, color: "black" }}>
+                                        Strona {page} z {Math.ceil(count / 3)}
+                                    </Typography>
+                                )}
+                                <Button
+                                    variant="outlined"
+                                    onClick={() => fetchData(page + 1)}
+                                    disabled={!next}
+                                    sx={{ marginLeft: 1 }}
+                                >
+                                    Następna
+                                </Button>
+                            </Box>
+                        </Box>
+                    </Box>
                 </Box>
-            </Box >
+            </Box>
         </>
     );
 };
