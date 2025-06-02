@@ -191,9 +191,17 @@ const GuessPlayerPage = () => {
                             alignSelf: { xs: "center", sm: "center" },
                         }}
                     >
-                        <Typography variant="h5" align="center" gutterBottom>
+                        <Typography variant="h5" align="center" mb={1.5}>
                             Zgadnij piłkarza
                         </Typography>
+
+                        <Typography
+                            variant="subtitle1"
+                            sx={{ mb: 1, textAlign: "center", display: "block", width: "100%" }}
+                        >
+                            Pozostałe próby: {remaining}
+                        </Typography>
+
                         <form onSubmit={handleSubmit}>
                             <Autocomplete
                                 freeSolo
@@ -230,12 +238,7 @@ const GuessPlayerPage = () => {
                             </Button>
                         </form>
 
-                        <Typography
-                            variant="subtitle1"
-                            sx={{ mt: 2, textAlign: "center", display: "block", width: "100%" }}
-                        >
-                            Pozostałe próby: {remaining}
-                        </Typography>
+
 
                         {loading && <CircularProgress sx={{ mt: 2 }} />}
                         {error && (
