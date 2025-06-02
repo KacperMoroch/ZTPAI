@@ -16,20 +16,21 @@
 
 ---
 
-## 2️⃣ Strona główna ze wszystkimi opcjami i trybami quizów  
+## 2️⃣ Strona główna ze wszystkimi opcjami, trybami quizów i listą piłkarzy z opcjami filtrowania i sortowania  
 ![Dashboard](ui-app/src/assets/dashboard.png)  
 
 ---
 
 ## 3️⃣ Twój profil 
-Pokazuje datę założenia konta, osiągnięcia użytkownika oraz umożliwia zmianę zdjęcia profilowego  .
+Pokazuje datę założenia konta, osiągnięcia użytkownika oraz umożliwia zmianę zdjęcia profilowego.
 ![Profil](ui-app/src/assets/profil.png)  
 
 ---
 
 ## 4️⃣ Panel Administratora 
 Umożliwiający przeglądanie i usuwanie użytkowników z bazy. 
-![Panel Administratora](ui-app/src/assets/admin.png)  
+![Panel Administratora](ui-app/src/assets/admin.png)
+![Panel Administratora](ui-app/src/assets/admin_2.png)    
 
 ---
 
@@ -43,12 +44,13 @@ Umożliwiają zmianę loginu i e-maila użytkownika oraz pozwalają na usunięci
 Tryb polega na odgadnięciu losowego piłkarza z TOP 5 lig europejskich.  
 Po wpisaniu nazwy piłkarza w oknie pojawiają się podpowiedzi, które atrybuty naszego piłkarza zgadzają się z piłkarzem do odgadnięcia.  
 ![Zgadnij Piłkarza](ui-app/src/assets/zgadnij.png)  
+![Zgadnij Piłkarza](ui-app/src/assets/zgadnij_2.png)
 
 ---
 
 ## 7️⃣ Codzienny Tryb "Zgadnij Transfer"  
 Gracz musi odgadnąć piłkarza, który brał udział w transferze wyświetlonym na ekranie.  
-![Zgadnij Transfer](ui-app/src/assets/transfer.png) 
+![Zgadnij Transfer](ui-app/src/assets/transfer_2.png) 
 
 ---
 
@@ -63,9 +65,9 @@ Gracz musi odgadnąć piłkarza, który brał udział w transferze wyświetlonym
 
 # 🛠 **Technologie użyte w projekcie**
 
-✅ **FRONTEND: React** 
-✅ **BACKEND: Django**   
-✅ **BAZA DANYCH: PostgreSQL** 
+✅ **FRONTEND:** React  
+✅ **BACKEND:** Django  
+✅ **BAZA DANYCH:** PostgreSQL 
 
 ---
 
