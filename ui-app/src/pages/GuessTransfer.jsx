@@ -181,10 +181,12 @@ const GuessTransfer = () => {
                             padding: { xs: 2, md: 3 },
                             maxWidth: { xs: 300, md: 400 },
                             width: "100%",
-                            textAlign: "center"
+                            textAlign: "center",
+                            backgroundColor: "#0078A0",
+                            color: "#fff",
                         }}
                     >
-                        <Typography variant="h5" mb={2}>
+                        <Typography variant="h5" align="center" mb={1.5}>
                             Zgadnij transfer
                         </Typography>
 
@@ -206,6 +208,7 @@ const GuessTransfer = () => {
                                         fullWidth
                                         placeholder="Wpisz nazwisko piłkarza"
                                         required
+                                        sx={{ backgroundColor: "#fff", borderRadius: 1 }}
                                         onFocus={() => {
                                             if (playerOptions.length === 0) {
                                                 fetchSuggestions("");
