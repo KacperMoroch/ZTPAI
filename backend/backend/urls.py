@@ -27,7 +27,7 @@ from api.views.guess_player import check_guess, get_player_names, get_game_statu
 
 
 from api.views.users import get_all_users, get_user, register_user, login_user 
-from api.views.players import get_all_players, get_player
+from api.views.players import get_all_players, get_player, get_unique_filters
 from api.views.roles import get_roles
 from api.views.example import ExampleView
 
@@ -89,6 +89,8 @@ urlpatterns = [
     path('api/transfer/guess', guess_transfer_player, name='guess_transfer_player'),
 
     path('api/profile/upload-picture/', upload_profile_picture,name='upload_profile_picture'),
+
+    path('api/filters/', get_unique_filters, name='get_unique_filters'),
 
 ]
 
