@@ -12,9 +12,9 @@
     │     Frontend (React)       │                                        │       Backend (Django)      │
     │                            │                                        │                             │
     │  - React Router            |                                        │  - Django REST Framework    │
-    │  - React Query             |───────────HTTP/HTTPS Requests─────────>│  - JWT (SimpleJWT)          │
-    │  - JWT Auth                │                                        │  - Swagger                  │
-    │  - Base64                  │                                        │  - RabbitMQ producer        │
+    │  - JWT Auth                |───────────HTTP/HTTPS Requests─────────>│  - JWT (SimpleJWT)          │
+    │  - Base64                  │                                        │  - Swagger                  │
+    │                            │                                        │  - RabbitMQ producer        │
     └────────────────────────────┘                                        └─┬─────────────────────────┬─┘
                                                                             │                         │
                                                                             │                         │
