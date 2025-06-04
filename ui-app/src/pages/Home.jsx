@@ -45,6 +45,8 @@ const Home = () => {
     const [availableLeagues, setAvailableLeagues] = useState([]);
     const [availablePositions, setAvailablePositions] = useState([]);
 
+
+    const [sessionExpired, setSessionExpired] = useState(false);
     // Hook nawigacyjny
     const navigate = useNavigate();
 
@@ -61,6 +63,8 @@ const Home = () => {
 
     // Funkcja pobierająca dane piłkarzy z API
     const fetchData = async (pageNumber = 1) => {
+        if (sessionExpired) return;
+
         setLoading(true);
         setError(null);
         try {
@@ -74,17 +78,28 @@ const Home = () => {
 
             const url = `http://127.0.0.1:8000/api/players/?${params.toString()}`;
             const data = await fetchWithRefresh(url);
+            if (!data) {
+                setError("Sesja wygasła...");
+                setSessionExpired(true);
+                return;
+            }
             setPlayers(data.results);
             setCount(data.count);
             setNext(data.next);
             setPrevious(data.previous);
             setPage(pageNumber);
         } catch (err) {
-            setError(err.message);
+            if (err.message === "Sesja wygasła...") {
+                setError(err.message);
+                setSessionExpired(true);
+            } else {
+                setError("Wystąpił błąd: " + err.message);
+            }
         } finally {
             setLoading(false);
         }
     };
+
     const resetFiltersAndRefresh = () => {
         setCountry("");
         setLeague("");
@@ -99,14 +114,18 @@ const Home = () => {
     }, [country, league, position, sort]);
     // Hook uruchamiany po załadowaniu komponentu
     useEffect(() => {
+        if (sessionExpired) return;
+
         if (!isLoggedIn()) {
-            navigate("/login");
+            setError("Sesja wygasła...");
+            setSessionExpired(true);
+            setLoading(false);
             return;
         }
 
         fetchData(1);
         fetchFilters();
-    }, [navigate]);
+    }, [navigate, sessionExpired]);
 
     // Jeżeli trwa ładowanie – pokaż komponent ładowania
     if (loading) return <Loading />;
