@@ -62,6 +62,7 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),    # Czas życia tokenu dostępu 5 minut
    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),      # Czas życia tokenu odświeżenia 1 dni
+#    'REFRESH_TOKEN_LIFETIME': timedelta(minutes=2),
    'ROTATE_REFRESH_TOKENS': False,                   # Nie rotować tokenów odświeżenia (token sie nie zmienia)
    'BLACKLIST_AFTER_ROTATION': True,                # Czarna lista po rotacji tokenów (stare tokeny tu trafiają)
    'ALGORITHM': 'HS256',                             # Algorytm szyfrowania 
