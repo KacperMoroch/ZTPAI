@@ -22,7 +22,6 @@ const SettingsPage = () => {
         const fetchUserSettings = async () => {
             try {
                 const data = await fetchWithRefresh("http://127.0.0.1:8000/api/settings");
-                console.log("response from /settings", data);
                 if (data?.user) {
                     setUser(data.user);
                     setOriginalUser(data.user);

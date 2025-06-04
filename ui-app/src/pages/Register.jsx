@@ -31,7 +31,6 @@ const Register = () => {
         try {
             // Wysłanie danych do API rejestracji
             const response = await axios.post("http://127.0.0.1:8000/api/register/", userData);
-            console.log("Rejestracja udana:", response.data);
             navigate("/login"); // Przekierowanie do strony logowania po sukcesie
         } catch (error) {
             // Obsługa błędów odpowiedzi z serwera

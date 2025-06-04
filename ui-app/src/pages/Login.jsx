@@ -30,7 +30,6 @@ const Login = () => {
                 sessionStorage.setItem("token", access);
                 sessionStorage.setItem("refresh", refresh);
                 sessionStorage.setItem("is_superuser", is_superuser);
-                console.log(message || "Zalogowano pomyślnie.");
                 navigate("/"); // Przejście do strony głównej
             } else {
                 // Obsługa przypadku, gdy nie otrzymano tokena
