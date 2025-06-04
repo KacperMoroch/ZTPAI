@@ -9,7 +9,7 @@ export const fetchWithRefresh = async (url, options = {}) => {
     // Jeśli token nie istnieje – wyloguj użytkownika i zakończ funkcję
     if (!token) {
         logout();
-        return null;
+        throw new Error("Sesja wygasła...");
     }
 
     // Przygotowanie nagłówków z aktualnym tokenem
@@ -25,7 +25,10 @@ export const fetchWithRefresh = async (url, options = {}) => {
         // Jeśli odpowiedź to 401 Unauthorized – spróbuj odświeżyć token
         if (response.status === 401) {
             const newToken = await refreshAccessToken(); // próba odświeżenia tokenu
-            if (!newToken) return null; // jeśli odświeżenie się nie powiedzie – zakończ
+            if (!newToken) {
+                logout();
+                throw new Error("Sesja wygasła...");
+            }// jeśli odświeżenie się nie powiedzie – zakończ
 
             // Przygotowanie nagłówków z nowym tokenem
             const retryHeaders = {
