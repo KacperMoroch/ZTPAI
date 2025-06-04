@@ -1,18 +1,22 @@
 from django.http import JsonResponse
-from django.db import IntegrityError
-from django.core.exceptions import ValidationError
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+
 from ..exceptions import (
     InvalidLoginException,
     InvalidEmailException,
     EmailTakenException,
     LoginTakenException,
     AccountUpdateFailedException
+)
+from ..services.user_settings_service import (
+    get_user_settings,
+    update_user_account,
+    delete_user_account
 )
 
 
@@ -42,14 +46,8 @@ from ..exceptions import (
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def get_settings(request):
-    user = request.user
-    return Response({
-        'user': {
-            'login': user.login,
-            'email': user.email
-        }
-    })
-
+    data = get_user_settings(request.user)
+    return Response(data)
 
 
 @swagger_auto_schema(
@@ -89,46 +87,8 @@ def get_settings(request):
 @permission_classes([IsAuthenticated])
 def update_account(request):
     data = request.data
-    login = data.get('login')
-    email = data.get('email')
-
-    if not login or len(login) < 4:
-        raise InvalidLoginException()
-
-    if not email or '@' not in email:
-        raise InvalidEmailException()
-
-    user = request.user
-    user.login = login
-    user.email = email
-
-    try:
-        user.full_clean()
-        user.save()
-    except ValidationError as e:
-        for field, messages in e.message_dict.items():
-            for msg in messages:
-                if 'email' in field and 'already exists' in msg.lower():
-                    raise EmailTakenException()
-                elif 'login' in field and 'already exists' in msg.lower():
-                    raise LoginTakenException()
-        raise AccountUpdateFailedException(detail=' '.join([msg for m in e.message_dict.values() for msg in m]))
-
-    except IntegrityError:
-        raise AccountUpdateFailedException(detail="Podany e-mail lub login jest już zajęty!")
-
-    except Exception as e:
-        raise AccountUpdateFailedException(detail=f'Wystąpił błąd: {str(e)}')
-
-    return Response({
-        'success': 'Dane zostały pomyślnie zaktualizowane!',
-        'user': {
-            'login': user.login,
-            'email': user.email
-        }
-    })
-
-
+    response_data = update_user_account(request.user, data.get('login'), data.get('email'))
+    return Response(response_data)
 
 
 @swagger_auto_schema(
@@ -151,6 +111,5 @@ def update_account(request):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def delete_account(request):
-    user = request.user
-    user.delete()
-    return Response({'success': True})
+    response_data = delete_user_account(request.user)
+    return Response(response_data)
