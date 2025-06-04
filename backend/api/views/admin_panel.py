@@ -8,9 +8,9 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
 from api.serializers import UserAccountSerializer
-from ..models import UserAccount
 from ..exceptions import UserNotFoundException
 from api.permissions import IsAdminUserCustom
+from api.services.admin_panel_service import get_user_by_id, delete_user_by_id  # import serwisów
 
 
 user_id_param = openapi.Parameter(
@@ -43,17 +43,13 @@ user_id_param = openapi.Parameter(
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated, IsAdminUserCustom])
 def user_detail(request, id):
-    try:
-        user = UserAccount.objects.get(pk=id)
-    except UserAccount.DoesNotExist:
-        raise UserNotFoundException()
-
     if request.method == 'GET':
+        user = get_user_by_id(id)
         serializer = UserAccountSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     elif request.method == 'DELETE':
-        user.delete()
+        delete_user_by_id(id)
         return Response({
             'success': True,
             'message': 'Użytkownik został usunięty.'
