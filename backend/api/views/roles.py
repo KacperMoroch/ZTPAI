@@ -5,9 +5,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from drf_yasg.utils import swagger_auto_schema
-from api.models import Role
-from api.serializers import RoleSerializer
 from drf_yasg import openapi
+from api.serializers import RoleSerializer
+from ..services.role_service import get_all_roles
+
 
 @swagger_auto_schema(
     method='get',
@@ -21,6 +22,5 @@ from drf_yasg import openapi
 @permission_classes([IsAuthenticated])
 @api_view(['GET'])
 def get_roles(request):
-    roles = Role.objects.all()
-    serializer = RoleSerializer(roles, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    roles_data = get_all_roles()
+    return Response(roles_data, status=status.HTTP_200_OK)
