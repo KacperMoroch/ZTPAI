@@ -4,14 +4,8 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-from datetime import date
 
-from ..models import Transfer, TransferQuestionOfTheDay, UserGuessLogTransfer
-from ..exceptions import (
-    MissingPlayerNameException,
-    GameNotStartedException,
-    NoMoreAttemptsException
-)
+from ..services.transfer_game_service import start_game_for_user, guess_player
 
 start_game_response_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
@@ -44,36 +38,9 @@ start_game_response_schema = openapi.Schema(
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def start_transfer_game(request):
-    user = request.user
-    today = date.today()
+    response_data = start_game_for_user(request.user)
+    return Response(response_data)
 
-    question, _ = TransferQuestionOfTheDay.objects.get_or_create(
-        question_date=today,
-        defaults={'transfer': Transfer.objects.order_by('?').first()}
-    )
-
-    transfer = question.transfer
-
-    log, _ = UserGuessLogTransfer.objects.get_or_create(
-        user=user,
-        guess_date=today,
-        defaults={'guess_number': 0, 'guessed_correctly': False}
-    )
-
-    remaining_attempts = max(0, 5 - log.guess_number)
-    game_over = log.guessed_correctly or remaining_attempts == 0
-
-    return Response({
-        "transfer_details": {
-            "from_club": transfer.from_club.name,
-            "to_club": transfer.to_club.name,
-            "transfer_amount": float(transfer.transfer_amount),
-        },
-        "remaining_attempts": remaining_attempts,
-        "game_over": game_over,
-        "guessed_correctly": log.guessed_correctly,
-        "correct_player": transfer.player.name if game_over else None
-    })
 
 
 guess_transfer_player_request = openapi.Schema(
@@ -112,61 +79,6 @@ guess_transfer_player_response = openapi.Schema(
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def guess_transfer_player(request):
-    user = request.user
     player_name = request.data.get("player_name", "").strip()
-    today = date.today()
-
-    if not player_name:
-        raise MissingPlayerNameException()
-
-    try:
-        question = TransferQuestionOfTheDay.objects.get(question_date=today)
-    except TransferQuestionOfTheDay.DoesNotExist:
-        raise GameNotStartedException()
-
-    transfer = question.transfer
-    log, _ = UserGuessLogTransfer.objects.get_or_create(
-        user=user,
-        guess_date=today,
-        defaults={'guess_number': 0, 'guessed_correctly': False}
-    )
-
-    if log.guessed_correctly:
-        raise NoMoreAttemptsException(detail={
-            "error": "Już zgadłeś dzisiaj piłkarza. Spróbuj jutro.",
-            "correct_player": transfer.player.name,
-            "game_over": True,
-        })
-
-    if log.guess_number >= 5:
-        raise NoMoreAttemptsException(detail={
-            "error": "Nie masz więcej prób. Spróbuj ponownie jutro.",
-            "correct_player": transfer.player.name,
-            "game_over": True,
-            "remaining_attempts": 0
-        })
-
-    guessed_correctly = player_name.lower() == transfer.player.name.lower()
-    log.guess_number += 1
-    if guessed_correctly:
-        log.guessed_correctly = True
-    log.save()
-
-    remaining_attempts = max(0, 5 - log.guess_number)
-    game_over = guessed_correctly or remaining_attempts == 0
-
-    response_data = {
-        "guessed_correctly": guessed_correctly,
-        "remaining_attempts": remaining_attempts,
-        "game_over": game_over,
-        "correct_player": transfer.player.name if guessed_correctly or game_over else None
-    }
-
-    if guessed_correctly or game_over:
-        response_data.update({
-            "from_club": transfer.from_club.name,
-            "to_club": transfer.to_club.name,
-            "transfer_amount": float(transfer.transfer_amount)
-        })
-
+    response_data = guess_player(request.user, player_name)
     return Response(response_data)
